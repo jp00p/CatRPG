@@ -4,6 +4,8 @@ from pyfiglet import Figlet
 from colorama import init, Fore, Back, Style
 from termcolor import colored 
 
+# todo:
+# NPCS, quests, riddles, attitudes
 
 init(autoreset=True)
 # colored_text = colored('Title Screen', 'green', 'on_red')
@@ -637,6 +639,7 @@ class Game():
               direction = 3
             self.player.try_move(worldMap[self.player.location], direction)
         if(verb in ["look", "sniff"]):
+          # todo: take, hit, push
           if(noun not in room_events or noun == ""):
             worldMap[self.player.location].describe()
           else:
