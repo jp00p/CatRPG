@@ -1,11 +1,20 @@
-import cmd, textwrap, sys, os, time, string, platform
+from __future__ import print_function
+import cmd, textwrap, sys, os, time, string, platform, copy
 from random import seed, randint, randrange, choice, sample
 from pyfiglet import Figlet
 from colorama import init, Fore, Back, Style
 from termcolor import colored 
+from terminaltables import AsciiTable, DoubleTable, SingleTable
+
+from character.gamemonsters import gameMonsters
+from character.movelist import moveList
+from character.breed import Breed, breedList
+from items.gameitems import Item, gameItems
+from world.worldmap import Room, worldMap, Event, NPC, npcList
+#from world.npc import NPC
 
 # todo:
-# NPCS, quests, riddles, attitudes
+# NPCS, quests, riddles, attitudes, keep away?
 
 init(autoreset=True)
 # colored_text = colored('Title Screen', 'green', 'on_red')
@@ -44,23 +53,10 @@ def centered(text):
     final = "\n".join(line.center(screen_width) for line in lines)
     print(final)
 
-def print_msg_box(msg, indent=1, width=screen_width-4, title=None):
-    """Print message-box with optional title."""
-    lines = msg.split('\n')
-    space = " " * indent
-    box = ''
-    if not width:
-        width = max(map(len, lines))
-    if not title:
-      box += f'╔{"═" * (width + indent * 2)}╗\n'  # upper_border
-    else:
-      title = "╣ " + str(title) + " ╠"
-      box += f'╔'
-      box += title.center(width + indent * 2, "═")
-      box += f'╗\n'  # upper_border       
-    box += ''.join([f'║{space}{line:<{width}}{space}║\n' for line in lines])
-    box += f'╚{"═" * (width + indent * 2)}╝'  # lower_border
-    print(box)
+def print_msg_box(msg, indent=1, width=screen_width-4, title=""):
+    print("・━━━━━♡━☆★ " + title + " ★☆━♡━━━━━・\n")
+    msg = text_wrapper.fill(msg)
+    print(msg)
 
 ### Base Character Class
 class Character:
@@ -78,7 +74,6 @@ class Character:
       hr()
       print(move_desc.format(self.name, other.name)) # describe attack
       hr()
-      
       # for each time the move can hit (move.times)
       for _ in range(move.times[0], move.times[1]):
 
@@ -90,7 +85,8 @@ class Character:
         dmg = 0 # holds the total dmg
         hit = d20+self.acrobatics+hit_mod # THAC0
         target = 10+other.acrobatics # AC
-        #print("ATTACK #{} -- HIT ROLL: {}({}) -- TARGET AC: {} ".format(attack_time,hit,d20,target))
+        print("DEBUG: MOVE HIT:{} -- BASE_DMG:{}".format(hit_mod, base_dmg))
+        print("DEBUG: ATTACK #{} -- HIT ROLL: {}({}) -- TARGET AC: {} ".format(attack_time,hit,d20,target))
         attack_time += 1
 
         if(d20 == 20):
@@ -118,12 +114,15 @@ class Character:
       speak(dmg_string)
       time.sleep(0.25)
 
-# Enemy is just a basic Character right now
 class Enemy(Character):
-  def __init__(self, hp=0, **kwargs):
+  def __init__(self, hp=0, xp_given=1, **kwargs):
     super().__init__(**kwargs)
     self.max_hp = hp
     self.hp = hp
+    self.xp_given = xp_given
+
+
+
 
 ### Player Character
 class Player(Character):
@@ -135,18 +134,37 @@ class Player(Character):
     self.hat = None # armor slot
     self.level = 1
     self.xp = 0
-    self.hp = 50
-    self.max_hp = 50
+    self.hp = 36
+    self.max_hp = 36
     self.items = items
+    self.kills = {}
+    self.quest_monsters = []
+    self.quest_items = []
   def required_xp(self):
     req = (self.level * 5)+self.level-1
     return req
+  def give_quest(self,quest_type,quest_thing):
+    if(quest_type == "monster"):
+      self.quest_monsters.append(quest_thing)
+      self.kills[quest_thing] = 0
+    else:
+      self.quest_items.append(quest_thing)
+  def remove_quest(self, quest_type, quest_thing):
+    if(quest_type == "monster"):
+      print("removing monster: {}".format(quest_thing))
+      self.quest_monsters.remove(quest_thing)
+    else:
+      self.quest_items.remove(quest_thing)
+  def remove_items(self,items):
+    for item in items:
+      self.items.remove(item)
+    
   def equip(self,item=""):
     if(item == ""):
       print("What are you trying to equip?")
       return
-    print("Current items:\n{}".format(self.list_items))
-    print("Item name to equip:{} ".format(item))
+    print("DEBUG Current items:\n{}".format(self.list_items()))
+    print("DEBUG Item name to equip:{} ".format(item))
     item = gameItems[item]
     if(item not in self.items):
       print("You don't have that item")
@@ -157,11 +175,25 @@ class Player(Character):
       if(self.hat != None):
         print("You remove your {} and put it back in your inventory.".format(self.hat.name))
         self.items.append(self.hat)
-      self.hat = item
+      self.apply_item(item)
       print("You put on the {}".format(item.name))
-  def apply_attitude(self,item):
-    # for when events apply items
-    return
+  def apply_item(self,item):
+    if(item.item_type == "hat"):
+      old_item = self.hat
+      self.hat = item
+    elif(item.item_type == "attitude"):
+      old_item = self.attitude
+      self.attitude = item
+    if(old_item != None):
+      self.ferocity -= old_item.fer
+      self.acrobatics -= old_item.acr
+      self.curiosity -= old_item.cur
+      self.max_hp -= old_item.max_hp
+    self.ferocity += item.fer
+    self.acrobatics += item.acr
+    self.curiosity += item.cur
+    self.max_hp += item.max_hp
+
   def list_items(self):
     _items = ""
     for i in range(len(self.items)):
@@ -184,38 +216,47 @@ class Player(Character):
       return self.attitude.name
   def show_status(self):
     cls()
-    title = "{} the {}".format(self.name.capitalize(), self.breed)
+    title = "{} the {}\n".format(self.name.capitalize(), self.breed)
     status = "Level: {}\n".format(self.level)
-    status += "Attitude: {}   Hat: {}\n".format(self.get_attitude(), self.get_hat())
-    status += "HP: {}/{}  XP: {}\n".format(self.hp,self.max_hp,self.xp)
-    status += "Required for next level: {}\n".format(self.required_xp())
-    status += "Ferocity: {}  Acrobatics: {}  Curiosity: {}\n".format(self.ferocity, self.acrobatics, self.curiosity)
-    status += "Move List: {}\n".format(self.list_attacks())
-    status += "Item List: {}\n".format(self.list_items())
-    print_msg_box(status,1,screen_width-4,title)
+    status += "Attitude: {}\tHat: {}\n".format(self.get_attitude(), self.get_hat())
+    status += "HP: {}/{}\tXP: {}/{}\n".format(self.hp,self.max_hp,self.xp, self.required_xp())
+    status += "Ferocity: {}\tAcrobatics: {}\tCuriosity: {}\n".format(self.ferocity, self.acrobatics, self.curiosity)
+    status += "Move List:\n{}\n".format(self.list_attacks())
+    status += "Item List:\n{}\n".format(self.list_items())
+    status += "Quest Items:{}\nQuest Monsters:{}\nQuest Kills:{}\n".format(self.quest_items,self.quest_monsters,self.kills)
+    print(title)
+    print(status)
     
   def try_move(self,curRoom,direction):
     # dirs = { 0:"North", 1:"East", 2:"South", 3:"West" }
     if(curRoom.exits[direction] != False):
       new_room = worldMap[curRoom.exits[int(direction)]]
-      self.enter(new_room,curRoom.exits[direction])
+      self.enter(new_room)
     else:
       print("You can't go that way")
       return False
-  def enter(self,room,room_id):
-    self.location=room_id
+  def enter(self,room):
+    if(type(room) == str):
+      room = worldMap[room]
+    self.location=room.id
+    tickmap = copy.deepcopy(worldMap)
+    for i in tickmap:
+      i = tickmap[i]
+      if(i.npc != ""):
+        print("{} is moving".format(i.npc))
+        npcList[i.npc].tick()
     room.describe()
 
   # rest your weary head  
   def rest(self):
-    print("You will use some XP when resting.  You won't lose any levels or stats.\nAll of your HP will be restored.")
+    print("You will lose up to {} XP when resting.  You won't lose any levels or stats.\nAll of your HP will be restored.".format(self.level))
     print("Rest? (y/n)")
     action = input("?> ")
     action = str(action).lower()
     if(action in ["yes","y","no","n"]):
       if(action in ["yes","y"]):
         self.hp = self.max_hp
-        loss = randint(0,3)
+        loss = randint(0,self.level)
         self.xp -= loss
         if(self.xp < 0):
           self.xp = 0
@@ -224,38 +265,47 @@ class Player(Character):
         return
     else:
       print("Invalid action")
+      return
 
   def hunt(self, room):
+    if(self.hp <= 0):
+      print("You are too tired for hunting now. You need to rest.")
+      return
     if(room.random_battle == True):
       e = gameMonsters[choice(room.enemies)]
       enemy = Enemy(name=e["name"],hp=e["hp"],moves=e["moves"])
       cls()
-      speak("You spot a {}!".format(enemy.name))
+      encounter = ["You spot a {}!", "You encounter a {}!", "You come upon a {}!"]
+      speak(choice(encounter).format(enemy.name))
       time.sleep(1)
       if(self.battle(enemy)):
-        print("You are master of the hunt!")
+        victory = ["Victory!", "You are the ultimate hunter!", "You have emerged victorious!", "You are master of the hunt!"]
+        print(choice(victory))
       else:
-        print("You need to rest.")
+        print("You are too tired for hunting now. You need to rest.")
       del enemy
     else:
       print("There doesn't seem to be anything to hunt around here.")
   def level_up(self):
-    print("Level up!")
+    print("DING!  Level up!  GRATTIES!")
     print("Choose an attribute to level up:")
     print("1. Ferocity: {}\n2. Acrobatics: {}\n3. Curiosity: {}".format(self.ferocity, self.acrobatics, self.curiosity))
-    stat = input("?> ")
-    while(stat.isdigit() == False):
-      print("Try that again.")
+    stat = int(input("?> "))
+    if(stat == ""):
+      print("Try that again. (1,2,3)")
       self.level_up()
     if(stat in [1,2,3]):
       if(stat == 1):
         self.ferocity += 1
+        print("Your ferocity is now {}".format(self.ferocity))
       if(stat == 2):
         self.acrobatics += 1
+        print("Your acrobatics is now {}".format(self.acrobatics))
       if(stat == 3):
         self.curiosity += 1
+        print("Your curiosity is now {}".format(self.curiosity))
       self.level += 1
-      hp_increase = randint(1,8)
+      hp_increase = randint(1,8)+2
       self.max_hp += hp_increase
       print("Your max HP also went up by {} points (now {})".format(hp_increase,self.max_hp))
     else:
@@ -264,7 +314,6 @@ class Player(Character):
     
   def battle(self,enemy):
     cls()
-    
     victory = False
     turn = 1
     initiative = randint(0,1)
@@ -279,14 +328,18 @@ class Player(Character):
       # do player stuff
       # debug
       #print("Turn #{} -- PHP: {} -- EHP: {}".format(turn,self.hp,enemy.hp))
+      if(enemy.hp < 0):
+        enemy.hp = 0
       combat_data = "Your HP: "
       combat_data += colored(str(self.hp), 'green')
       combat_data += "\n"
       combat_data += "Enemy HP: "
       combat_data += colored(str(enemy.hp), 'red')
       combat_data += "\n"
-      print("Turn: {}".format(turn))
-      print_msg_box(combat_data)
+      title = "Turn: {}".format(turn)
+      print_msg_box(combat_data, title)
+
+
       if(initiative == 0 and enemy.hp > 0):
         enemy.attack(self,choice(enemy.moves))
       
@@ -301,11 +354,13 @@ class Player(Character):
       else:
         # kill enemy
         victory = True
-        self.xp += 1
+        self.xp += enemy.xp_given
+        print("You earned {} xp!".format(enemy.xp_given))
+        if(enemy.name.lower() in self.quest_monsters):
+          self.kills[enemy.name.lower()] += 1
         if(self.xp >= self.required_xp()):
           self.level_up()
         return victory
-
       if(initiative == 1 and enemy.hp > 0):
         enemy.attack(self,choice(enemy.moves))
       turn += 1
@@ -315,278 +370,30 @@ class Player(Character):
 
 
 
-# an attack move
-class Move:
-  def __init__(self, name="", verbs=[], dmg=[], hit=0, targets=[1,1], times=[0,1], **kwargs):
-    self.name = name
-    self.verbs = verbs
-    self.dmg = dmg
-    self.hit = hit
-    self.targets = targets
-    self.times = times
 
-moveList = {
-  "claw" : Move(
-    name="Claw",
-    verbs=['{} swipes at {} with their claws!', '{} slashes with their claws!'],
-    dmg = [1,6],
-    times = [0,2]
-  ),
-  "bite" : Move(
-    name="Bite",
-    verbs=['{} chomps on {}!', '{} bites {}!', '{} gives {} a little nibble.'],
-    dmg = [0,1],
-    hit = -1,
-  ),
-  "peck" : Move(
-    name="Peck",
-    verbs=['{} pecks at {}!', '{} dives at {} with their beak!'],
-    dmg = [1,2],
-    times = [0,4]
-  ),
-  "kick" : Move(
-    name="Kick",
-    verbs=['{} does a crazy kick!', '{} kicks {}!'],
-    dmg=[10,15],
-    times = [0,1]
-  ),
-  "slap" : Move(
-    name="Slap",
-    verbs=['{} does a powerful multi-slap!'],
-    dmg=[2,4],
-    times = [0,3]
-  ),
-  "tailgrab" : Move(
-    name="Tail Grab",
-    verbs = ['{} grabs {}\'s tail!'],
-    dmg=[4,6],
-    times=[0,1],
-    hit=-2
-  ),
-  "backrub" : Move(
-    name="Backwards Fur Rub",
-    verbs = ['{} rubs {}\'s backwards!'],
-    dmg=[1,2],
-    times=[0,2]
-  )
-}
- 
-#  ###################  #
-#  MONSTER FACTORY !!!  #
-#  ###################  #
-def makeMonster(name, moves, hp):
-  monster = Enemy(name=name,moves=moves,max_hp=hp)
-  return monster
 
-gameMonsters = {
-  "bird" : {
-    "name" : "Bird",
-    "moves" : [moveList["peck"]],
-    "hp" : 20
-  },
-  "squirrel" : {
-    "name" : "Squirrel",
-    "moves" : [moveList["bite"],moveList["claw"]],
-    "hp" : 12
-  }
-  # "mouse" : makeMonster("Mouse"),
-  # "alleycat" : makeMonster("Alleycat"),
-  # "child" : makeMonster("Human Child")
-}
-mlist = gameMonsters.keys()
 # random battle with random monster example:
 #
 # v = game.battle(p, gameMonsters[choice(list(mlist))])
 #
 #
 
-class Item():
-  def __init__(self, name="",fer=0,acr=0,cur=0,max_hp=0,item_type="", **kwargs):
-    self.name = name
-    self.fer = fer
-    self.acr = acr
-    self.cur = cur
-    self.max_hp = max_hp
-    self.item_type = item_type
-    return
-
-gameItems = {
-  "grumpy" :      Item("Grumpy", 0,0,0,0, item_type="attitude"),
-  "zoomy" :       Item("Zoomy", 0,0,0,0, item_type="attitude"),
-  "inquisitive" : Item("Inquisitive", 0,0,0,0, item_type="attitude"),
-  "sleepy" :      Item("Sleepy", 0,0,0,0, item_type="attitude"),
-  "top hat" :      Item("Top Hat", 0,0,0,0, item_type="hat"),
-  "bunny ears"  :      Item("Bunny Ears", 1,1,1,1, item_type="hat")
-}
-
-
-
-class Event:
-  def __init__(self, reqs={}, descs={}, trigger_text="", remove_self=False, on_trigger=[], e_type="",**kwargs):
-    self.reqs = reqs
-    self.descriptions = descs
-    self.trigger_text = trigger_text
-    self.remove_self = remove_self
-    self.on_trigger = on_trigger
-    self.e_type = e_type
-  def fire(self, noun, verb, player):
-    print("Debug: Required {}: {} - Yours is {}\nTriggered on {}".format(
-      self.reqs["stat"],
-      self.reqs["value"],
-      getattr(player,self.reqs["stat"]),
-      self.reqs["trigger"]
-    ))
-    if(self.descriptions[verb] != False):
-      print(self.descriptions[verb])
-    if((getattr(player,self.reqs["stat"]) >= self.reqs["value"]) and (verb == self.reqs["trigger"])):
-      print(self.trigger_text)
-      if(self.on_trigger):
-        obj = self.on_trigger[0]
-        method = self.on_trigger[1]
-        value = self.on_trigger[2]
-        if(obj == "room"):
-          call = getattr(worldMap[player.location],method)
-        if(obj == "player"):
-          call = getattr(player,method)
-        call(value) # def need some error handling here
-      if(self.remove_self):
-        worldMap[player.location].events.pop(noun)
-
-      
 
 
 
 
-
-class Room:
-  def __init__(self, name='', area='', description = '', room_type = '',\
-               enemies = [], items = [], exits = [],\
-               random_battle = False, state=0, states = {}, events = {}, **kwargs):
-    self.room_type = room_type
-    self.name = name
-    self.area = area
-    self.description = description # evergreen description
-    self.states = states # list of states
-    self.state = state # which state is the room in
-    self.items = items # list of obtainable items (using get verb)
-    self.events = events
-    self.enemies = enemies # maybe...
-    self.exits = exits # which exits does this room have
-    self.random_battle = random_battle
-  def show_exits(self):
-    dirs = {0:"North", 1:"East", 2:"South", 3:"West"}
-    for dirkey in list(dirs.keys()):
-      if(self.exits[dirkey] is not False):
-        return("{}: {}\n".format(dirs[dirkey],worldMap[str(self.exits[dirkey])].name))
-  def get_event_list(self):
-    elist = self.events.keys()
-    return elist
-  def describe(self):
-    cls()
-    centered("Area: "+self.area)
-    print("\n")
-    area_text = self.description + "\n"
-    if(self.states):
-      area_text += self.states[self.state]+"\n"
-    area_text += "Exits".center(screen_width-4,"-")
-    area_text += "\n"
-    area_text += self.show_exits()
-    print_msg_box(area_text,title=self.name)
-    time.sleep(0.33)
-  def setState(self, state):
-    self.state = state
-
-worldMap = {
-  "fyard1" : Room(
-    name="A Bushy Corner",
-    area="Front Yard",
-    description="A corner of the yard full of bushes. You see a note pinned to a tree.",
-    items=[],
-    exits=["porch1","fyard2",False,False],
-    enemies=["bird", "squirrel"],
-    random_battle=True,
-    state=1,
-    states={
-      0:"Nothing is going on around here right now",
-      1:"There's a fire!",
-      2:"Notes are fun to read."
-    },
-    events={
-      "catnip" : Event(
-        reqs={ 
-          "stat" : "curiosity", 
-          "value": 1, 
-          "trigger":"sniff" 
-        },
-        descs={ "sniff": "Smells a little funny.", "look" : "Almost looks illegal." },
-        trigger_text="You get a little high from sniffing the nip.", 
-        remove_self=True,
-        on_trigger=["room", "setState", 0],
-        e_type="text"
-      ),
-      "note" : Event(
-        reqs={ 
-          "stat" : "curiosity", 
-          "value": 2, 
-          "trigger":"look" 
-        },
-        descs={ "sniff": "Smells like paper and ink.", "look" : "You can barely make out the words." },
-        trigger_text="The note says \"Wow this works great.\"", 
-        remove_self=False,
-        on_trigger=["room", "setState", 2],
-        e_type="text"
-      )
-    }
-  ),
-  "fyard2" : Room(
-    name="Grassy Lounging Area",
-    area="Front Yard",
-    description="A nice, grassy area to relax in.",
-    exits=["porch1", False, False, "fyard1"]
-  ),
-  "porch1" : Room(
-    name="Secretive Porch",
-    area="House (Outside)",
-    description="A nice hiding spot",
-    exits=["house1", False, False, "fyard1"]
-  ),
-  "house1" : Room(
-    name="Food cave",
-    area="House (Inside)",
-    description="This where the food is",
-    exits=[False,False,"porch1",False]
-  )
-}
-
-class Breed():
-  def __init__(self, name="", stats=[], desc="", **kwargs):
-    self.name = name
-    self.stats = stats # fer,acr,cur
-    self.desc = desc
-
-breedList = [
-  Breed("Debug Cat", [50,50,50], "GOD MODE"),
-  Breed("Domestic Shorthair", [2,2,1], "Average and curious"),
-  Breed("Persian", [3,1,0], "Slow but fluffy"),
-  Breed("Sphynx", [1,3,0], "Quick and lightweight"),
-  Breed("Tuxedo", [2,0,2], "Well-dressed and inquisitve"),
-  Breed("Maine Coon", [4,0,0], "Super big and beautiful"),
-  Breed("Abyssinian", [0,4,0], "Lean and super acrobatic"),
-  Breed("Scottish Fold", [0,0,4], "Super curious explorer")
-]
 
 # main game class/functions
 class Game():
   def __init__(self, player=None):
     self.state = 0
-    self.location = "house1"
-    self.starting_location = "fyard1"
+    self.starting_location = "start4"
     self.boss_location = "alley6"
     self.name = "Cat Game"
     self.player = player
     self.score = 0
     self.turn = 0
-    self.acceptable_verbs = ["move", "go", "look", "hunt", "sniff", "equip", "status", "rest"]
+    self.acceptable_verbs = ["move", "go", "look", "inspect", "examine", "hunt", "sniff", "smell", "equip", "status", "rest", "sleep", "climb", "help", "talk", "speak"]
     self.up_dir = ["up","u","n","north"]
     self.down_dir = ["down","d","s","south"]
     self.left_dir = ["left","l","w","west"]
@@ -600,7 +407,10 @@ class Game():
       self.start_game()
       
   def prompt(self):
-    print_msg_box("What would you like to do? (move, look, sniff, status, help...)")
+    print("┍━━━━━━━━━━━━━━✿━━━━━━━━━━━━━━━┑")
+    print("  What would you like to do?")
+    print("  (move, look, status, help...)")
+    print("┕━━━━━━━━━━━━━━✿━━━━━━━━━━━━━━━┙")
     action = input("?> ") or ""
     self.parse_input(action.lower())
     self.prompt() # loopback
@@ -610,7 +420,7 @@ class Game():
       pass
     else:
       action = action.split()
-      stopwords = ['at', 'the', 'my', 'a']
+      stopwords = ['at', 'the', 'my', 'a', 'to']
       verb = action[0]
       room_events = worldMap[self.player.location].get_event_list()
 
@@ -625,8 +435,15 @@ class Game():
 
       if verb in self.acceptable_verbs:
         # handle specific verbs
-        if(verb == "rest"):
+        self.turn += 1  # eh, lets do it here
+        if(verb in ["rest","sleep"]):
           self.player.rest()
+          pass
+        if(verb == "help"):
+          self.show_help_screen(True)
+          pass
+        if(verb in ["move", "go"] and noun == ""):
+          print("Try typing 'move north' or 'go east'")
           pass
         if(verb in ["move","go"] and noun != ""):
             if noun.lower() in self.up_dir:
@@ -638,10 +455,13 @@ class Game():
             elif noun.lower() in self.left_dir:
               direction = 3
             self.player.try_move(worldMap[self.player.location], direction)
-        if(verb in ["look", "sniff"]):
+        if(verb in ["look", "inspect", "examine","sniff", "smell", "climb", "take", "hit", "paw", "push"]):
           # todo: take, hit, push
           if(noun not in room_events or noun == ""):
-            worldMap[self.player.location].describe()
+            if(verb in ["look","inspect","examine"]):
+              worldMap[self.player.location].describe()
+            else:
+              print("There isn't a {} around here to {}?".format(noun,verb))
           else:
             worldMap[self.player.location].events[noun].fire(noun, verb, self.player)
           pass
@@ -654,6 +474,12 @@ class Game():
         if(verb == "status"):
           self.player.show_status()
           pass
+        if(verb in ["talk","speak"]):
+          if(worldMap[self.player.location].npc == ""):
+            print("There's no one to talk to here.")
+          else:
+            worldMap[self.player.location].handle_npc(self.player)
+          pass
       else:
         print("Not a proper command! Try again")
     self.prompt() # loop back
@@ -661,10 +487,28 @@ class Game():
     self.show_title_screen()
   def exit(self):
     sys.exit()
-  def show_help_screen(self):
-    print("Help screen goes here")
+  def show_help_screen(self, prompt=False):
+    cls()
+    print("= Help =")
+    print(" In this game, you are a cat. ")
+    print(" Your goal is to find and befriend all 7 cats in the neighborhood. ")
+    print(" Navigate by typing \"move east\" or \"go north\"" )
+    print(" You can just use the letters \"n e s w\" instead of the whole diretion ")
+    print(" Type \"look\" to get a description of the area you're in ")
+    print(" Type \"look tree\" to look at a tree in the area" )
+    print(" There are some other actions to discover too:  sniff, climb, hit... ")
+    print(" Type \"hunt\" to hunt for local wildlife and raise your skills!")
+    print(" Level up your stats to unlock more stuff! ")
+    print(" Type \"status\" to view your status ")
+    print(" Collect fun hats and \"equip\" them! Even though you don't have thumbs. ")
+    print(" Your attitude can change as well, just like a real cat. ")
+    print(" Type \"rest\" if your HP is low or 0. You will lose XP equal to your level (but you won't lose levels)")
+    print(" Making a map on paper is recommended! ")
     anykey()
-    self.show_title_screen()
+    if(prompt):
+      self.prompt()
+    else:
+      self.show_title_screen()
   def show_title_screen(self):
     cls()
     custom_fig = Figlet(font='univers')
@@ -672,7 +516,7 @@ class Game():
     self.title_screen_select()
   def title_screen_select(self):
     print_msg_box("Type: play, help or quit", indent=2, title="Make a choice")
-    action = input("?> ")
+    action = str(input("?> "))
     action = action.lower()
     if(action in self.title_choices):
       if action == "play":
@@ -682,20 +526,22 @@ class Game():
         self.exit()
       if action == "help":
         self.show_help_screen()
-      else:
-        print("Invalid action")
-        self.title_screen_select()
+    else:
+      print("Invalid action")
+      self.title_screen_select()
 
   ### Select breed for character creation        
   def breed_choice(self):
-    breed_choice_text = ""
-    breed_choice_title = "Pick a Breed"
+    print("Pick a Breed:")  
+    breed_data = ""
     for i in range(len(breedList)):
-      # show list like 1: BreedName...
-      breed_choice_text += "{}: {}\n".format(i+1, breedList[i].name)
-    print_msg_box(breed_choice_text,1,screen_width-4,breed_choice_title)
+      breed_data += "{}  {} - {}\n".format(str(i+1), breedList[i].name, breedList[i].desc)
+      #breed_choice_text += "{}: {} - {}\n".format(i+1, breedList[i].name, breedList[i].desc)
+    #print_msg_box(breed_choice_text,1,screen_width-4,breed_choice_title)
+    print(breed_data)
+    print("\n")
     print("Type the corresponding number:")
-    breed = input("?> ")
+    breed = str(input("?> "))
     if(breed.isdigit() == False):
       print("Invalid choice")
       self.breed_choice()
@@ -736,9 +582,9 @@ class Game():
       elif(confirm.lower() == "no"):
         self.character_creation()
       else:
-          self.show_title_screen()
+        self.show_title_screen()
   def enter_starting_location(self):
-    self.player.enter(worldMap[self.starting_location], self.starting_location)
+    self.player.enter(worldMap[self.starting_location])
     self.prompt()
  
 game = Game()
