@@ -48,14 +48,12 @@ class Room:
 
     def get_event_list(self):
         elist = []
-        if(self.events != False and len(self.events) > 0):
+        if(self.events != False):
             elist = self.events.keys()
         return elist
 
     def describe(self, worldMap, npcList):
         # cls()
-        print("Area: "+self.area+"\n")
-        print("DEBUG: ROOM_ID: {}".format(self.id))
         area_desc = self.description
         if(self.state != 0 and self.states):
             area_desc += "\n"+self.states[self.state]
@@ -63,12 +61,13 @@ class Room:
             area_desc += "\n"+npcList[self.npc].desc
         for i in self.get_event_list():
             # i == tree, eg
-            keyword = "({}{}{})".format(COLORS.BOLD, i, COLORS.END)
-            area_desc.replace(i, keyword)
-        print(area_desc)  # , title=self.name)
-        exits = self.show_exits(worldMap)
-        print("\nExits:\n{}".format(exits))
-        time.sleep(0.33)
+            keyword = "{}{}{}".format(COLORS.BOLD, i, COLORS.END)
+            area_desc = area_desc.replace(i, keyword)
+        #print(area_desc)  # , title=self.name)
+        #exits = self.show_exits(worldMap)
+        #print("\nExits:\n{}".format(exits))
+        #time.sleep(0.33)
+        return { "desc": area_desc, "title":self.name, "exits": self.exits, "npc": self.npc, "area":self.area, "room_id" : self.id }
 
     def set_state(self, state):
         self.state = state

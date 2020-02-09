@@ -21,7 +21,7 @@ class NPC:
         # 3 - quest complete
     def set_state(self,state):
         self.state = state
-    def tick(self):
+    def tick(self, worldMap):
         if(self.path is not False):
             self.path_tick += 1
             if(self.path_tick > len(self.path)-1):

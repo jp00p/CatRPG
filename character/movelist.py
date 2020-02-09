@@ -4,24 +4,25 @@ moveList = {
   "claw" : move.Move(
     name="Claw",
     verbs=['{} swipes at {} with their claws!', '{} slashes with their claws!'],
-    dmg = [1,6]
+    dmg = [1,6],
+    times = 2
   ),
   "doubleclaw" : move.Move(
     name="Double Claw",
     verbs = ['{} does a super fast double-claw!'],
     dmg = [1,8],
-    times = 2,
+    times = 4,
     hit = -2
   ),
   "bite" : move.Move(
     name="Bite",
     verbs=['{} chomps on {}!', '{} bites {}!'],
-    dmg = [1,1],
+    dmg = [1,12],
     hit = -1,
   ),
   "bunny" : move.Move(
     name="Bunny Kick",
-    verbs=['{} kicks and grabs and kicks!'],
+    verbs=['{} grabs and kicks like a wild bunny!'],
     dmg = [1,12]
   ),
   "pounce" : move.Move(
@@ -66,13 +67,13 @@ moveList = {
   "kick" : move.Move(
     name="Kick",
     verbs=['{} does a crazy kick!', '{} kicks {}!'],
-    dmg=[1,15]
+    dmg=[1,8]
   ),
   "slap" : move.Move(
     name="Slap",
     verbs=['{} does a powerful multi-slap!'],
     dmg=[2,4],
-    times=3
+    times=4
   ),
   "tailgrab" : move.Move(
     name="Tail Grab",
@@ -83,7 +84,7 @@ moveList = {
   ),
   "backrub" : move.Move(
     name="Backwards Fur Rub",
-    verbs = ['{} rubs {}\'s backwards!'],
+    verbs = ['{} rubs {}\'s fur backwards!'],
     dmg=[4,8],
     times=2
   )

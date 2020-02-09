@@ -10,7 +10,7 @@ class Event:
     self.remove_self = remove_self
     self.on_trigger = on_trigger
     self.e_type = e_type
-  def fire(self, noun, verb, player):
+  def fire(self, noun, verb, player, worldMap):
     print("\nDebug: Required {}: {} - Yours is {}\nTriggered on {}\n".format(
       self.reqs["stat"],
       self.reqs["value"],
@@ -35,5 +35,7 @@ class Event:
           call(value) # def need some error handling here
         if(self.remove_self):
           worldMap[player.location].events.pop(noun)
-    elif(self.descriptions[verb] != False):
+    elif(verb in self.descriptions.keys() and  self.descriptions[verb] != ""):
       print(self.descriptions[verb])
+    else:
+      print("You can't do that here.")
