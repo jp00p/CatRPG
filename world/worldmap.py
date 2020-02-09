@@ -1,6 +1,7 @@
 from . import room
 from . import event
 
+
 class COLORS:
     PURPLE = '\033[95m'
     CYAN = '\033[96m'
@@ -14,15 +15,16 @@ class COLORS:
     END = '\033[0m'
 
 
-# some common events 
-
+# some common events
 potion = event.Event(
     reqs={
-        "stat": "acrobatics", # doesnt matter which stat
-        "value": 0, # free thing
+        "stat": "acrobatics",  # doesnt matter which stat
+        "value": 0,  # free thing
         "trigger": "take"
     },
-    descs={"look": "Looks like a potion?", "sniff":"Smells healthy!", "paw":"That's not how you take things!"},
+    descs={"look": "Looks like a potion?", 
+           "sniff": "Smells healthy!",
+           "hit": "That's not how you take things!"},
     trigger_text="You take the potion.",
     remove_self=True,
     on_trigger=[["player", "give_items", ["potion"]]]
@@ -50,19 +52,20 @@ worldMap = {
             1: "Seems to be a popular spot for local cats to hunt.  A tall fence blocks your passage to the south. Your fallen foe, the stick, lies to the north."
         },
         events={
-            "potion" : potion,
+            "potion": potion,
             "stick": event.Event(
                 reqs={
                     "stat": "ferocity",
                     "value": 3,
                     "trigger": "hit"
                 },
-                descs={"sniff": "The stick smells sticky.", "look": "A strong cat could hit this stick away!",
+                descs={"sniff": "The stick smells sticky.",
+                       "look": "A strong cat could hit this stick away!",
                        "hit": "You hit the stick with all your cat strength, but it's not enough."},
                 trigger_text="You swipe at the stick and it clatters to the ground, startling you, but revealing a path to the north.",
                 remove_self=True,
-                on_trigger=[["room", "set_exits", ["fyard4", "start2", False, False]], [
-                    "room", "set_state", 1]],
+                on_trigger=[["room", "set_exits", ["fyard4", "start2", False, False]], 
+                            ["room", "set_state", 1]],
                 e_type="text"
             )
         }
@@ -89,7 +92,8 @@ worldMap = {
                        "look": "The first step is looking, but you're not fast enough."},
                 trigger_text="You naughtily dash across the street! There's a way north here!",
                 remove_self=True,
-                on_trigger=[["room", "set_exits", ["driveway", False, "start3", "start1"]], ["room", "set_state", 1]],
+                on_trigger=[["room", "set_exits", ["driveway", False, "start3", "start1"]], [
+                    "room", "set_state", 1]],
                 e_type="text"
             )
         }
@@ -116,7 +120,8 @@ worldMap = {
                        "look": "Looks like a trail made by other cats."},
                 trigger_text="The trail smells like treats!  You follow your nose and find a way through the trail to the north!",
                 remove_self=True,
-                on_trigger=[["room", "set_exits", ["nyard1", False, "start6", "start2"]], ["room", "set_state", 1]],
+                on_trigger=[["room", "set_exits", ["nyard1", False,
+                                                   "start6", "start2"]], ["room", "set_state", 1]],
                 e_type="text"
             ),
             "tree": event.Event(
@@ -125,8 +130,10 @@ worldMap = {
                     "value": 4,
                     "trigger": "climb"
                 },
-                descs={"sniff": "Something smells funny up one of these trees.", "look": "You see something up top one of the trees.",
-                       "hit": "You test your claws against the tree! Nothing happens.", "climb": "You can't seem to climb high enough, yet."},
+                descs={"sniff": "Something smells funny up one of these trees.",
+                       "look": "You see something up top one of the trees.",
+                       "hit": "You test your claws against the tree! Nothing happens.",
+                       "climb": "You can't seem to climb high enough, yet."},
                 trigger_text="You scramble up the tree and find a stash of catnip!  You get the zoomies!",
                 remove_self=True,
                 on_trigger=[["player", "apply_item", "zoomy"]]
@@ -138,9 +145,26 @@ worldMap = {
         room_id="start4",
         name="Your Yard",
         area="Outskirts",
-        description="This is the yard you've known most of your life. There's nothing new or interesting here. All the mice have been hunted to extinction.\nIt's time to venture out and seek new friends in the neighborhood!",
+        npc="momo",
+        description="This is the yard you've known most of your life, right outside your home. There's nothing new or interesting here. All the mice have been hunted to extinction.\nIt's time to venture out and seek new friends in the neighborhood!",
         exits=[False, "start5", False, False],
-        random_battle=False
+        random_battle=False,
+        events={
+            "home": event.Event(
+                reqs={
+                    "stat": "curiosity",
+                    "value": 0,
+                    "trigger": "sniff"
+                },
+                descs={"look": "Home sweet home. Where the food flows freely.",
+                       "paw": "You swipe the air at your house like a weirdo.",
+                       "climb": "You climb to the top of your house and survey the neighborhood."},
+                trigger_text="You smell the scents of home, making you feel nostalgic.",
+                remove_self=False,
+                on_trigger=[["player", "apply_item", "nostalgic"]]
+            )
+        }
+
     ),
     "start5": room.Room(
         room_id="start5",
@@ -166,7 +190,7 @@ worldMap = {
         area="Front Yard",
         description="Right in front of the house, there's a big, tall tree. Its branches reach above the roof of the house.  Birds and squirrels scurry around the area and make angry alert sounds at your presence.",
         items=[],
-        exits=["porch", "fyard2", "fyard3", False],
+        exits=[False, "fyard2", "fyard3", False],
         enemies=["bird", "squirrel"],
         random_battle=True,
         events={
@@ -176,7 +200,8 @@ worldMap = {
                     "value": 10,
                     "trigger": "climb"
                 },
-                descs={"look": "The tree goes up past the roof!", "sniff": "You can smell the faint scent of a cat that's run up the tree recently.",
+                descs={"look": "The tree goes up past the roof!",
+                       "sniff": "You can smell the faint scent of a cat that's run up the tree recently.",
                        "climb": "You try to find a good spot to climb up but aren't quite acrobatic enough... yet."},
                 trigger_text="You scramble up the tree and climb up to the roof!",
                 remove_self=False,
@@ -190,13 +215,13 @@ worldMap = {
         name="Sunny Resting Spot",
         area="Front Yard",
         description="A sunny and relaxing spot, with no wild creatures around to disturb you.  There's a big soft bed, just for cats, laying in the middle of a sunbeam.",
-        exits=["porch", False, "fyard4", "fyard1"],
+        exits=["porch", "driveway", "fyard4", "fyard1"],
         random_battle=False,
         events={
             "bed": event.Event(
                 reqs={
                     "stat": "acrobatics",
-                    "value": 0, # trap!
+                    "value": 0,  # trap!
                     "trigger": "lay"
                 },
                 descs={"look": "Looks like a warm and cozy spot to lay down.",
@@ -207,7 +232,7 @@ worldMap = {
             )
         }
     ),
-    "fyard3" : room.Room(
+    "fyard3": room.Room(
         room_id="fyard3",
         name="Leafy Pile",
         description="A huge leafy pile of leaves! The local cats like to bury stuff over here.",
@@ -217,10 +242,11 @@ worldMap = {
     "fyard4": room.Room(
         room_id="fyard4",
         name="House Cat Hunting Grounds",
-        description="A popular place for the local house cats to come out and hunt. The cats probably won't mind you hunting on their turf, but the prey here are tough.",
+        area="Front Yard",
+        description="A popular place for the local house cats to come out and hunt. The cats probably won't mind you hunting on their turf, but the prey here are pretty tough.",
         exits=["fyard2", False, "start1", "fyard3"],
         random_battle=True,
-        enemies=["bunny", "snake", "child"]
+        enemies=["bunny", "snake", "child", "angry_squirrel", "angry_bird"]
     ),
     "roof1": room.Room(
         room_id="roof1",
@@ -248,14 +274,16 @@ worldMap = {
         name="Driveway",
         area="Front Yard",
         description="The driveway acts as a central hub for most of the cats that live around here. It's safe, quiet, and leads to a lot of different areas.",
-        exits=["dummy", False, "start2", "fyard1"] # set south exit when start2 is done
+        # set south exit when start2 is done
+        exits=["dummy", False, "start2", "fyard1"]
     ),
     "porch": room.Room(
         room_id="porch",
         name="Porch",
         area="House (Outside)",
         description="Where most adventures begin for the local cats. A good place for scouting, surveying, and hiding.",
-        exits=["house3", False, "fyard1", False]
+        exits=["house3", False, "fyard1", False],
+        npc="mochi"
     ),
     "house1": room.Room(
         room_id="house1",
@@ -269,34 +297,72 @@ worldMap = {
         name="Bedroom",
         area="House (Inside)",
         description="Big bed",
-        exits=[False,False,"house4","house1"]
+        exits=[False, False, "house4", "house1"]
     ),
-    "house3" : room.Room(
+    "house3": room.Room(
         room_id="house3",
         name="Living Room",
         area="House (Inside)",
         description="Cat tower kingdom",
-        exits=["house1","house4","porch",False]
+        exits=["house1", "house4", "porch", False]
     ),
-    "house4" : room.Room(
+    "house4": room.Room(
         room_id="house4",
         name="Kitchen",
         area="House (Inside)",
         description="This is where the cat food is! There are stairs leading down into darkness...",
         exits=["house2", False, False, "house3"]
     ),
-    "nyard1" : room.Room(
+    "nyard1": room.Room(
         room_id="nyard1",
         name="Untamed Jungle",
         area="Neighbor's Yard",
-        description="This place is almost a literal jungle!",
-        exits=[False, "nyard2", "start3", "driveway"]
+        description="This place is almost a literal jungle! There are huge trees with vines hanging down, and bats squeaking overhead.",
+        events={
+            "vine": event.Event(
+                reqs={
+                    "stat": "acrobatics",
+                    "value": 8,
+                    "trigger": "hit"
+                },
+                descs={"look": "You can see something hanging from a vine.",
+                       "sniff": "The vines smell like bats!",
+                       "hit": "You try to hit the vine but you can't jump high enough yet."},
+                trigger_text="You do a super jump and knock a hat out of the tree!",
+                remove_self=True,
+                on_trigger=[["player", "give_items", ["bat hat"]]]
+            )
+        },
+        exits=[False, "nyard2", "start3", "driveway"],
+        enemies=["bat", "snake", "squirrel"],
+        random_battle=True
     ),
-    "nyard2" : room.Room(
+    "nyard2": room.Room(
         room_id="nyard2",
         name="Verdant Wetlands",
         area="Neighbor's Yard",
-        description="Lush and green and full of frogs.",
-        exits=[False,False,False,"nyard1"]
+        description="Lush, green and full of snails and frogs. There's a large pond here which you probably don't want to get into.",
+        exits=[False, False, False, "nyard1"],
+        enemies=["fish", "snake", "bird"],
+        random_battle=True,
+        events={
+            "pond": event.Event(
+                reqs={
+                    "stat": "curiosity",
+                    "value": 10,
+                    "trigger": "look"
+                },
+                descs={
+                    "look": "You think you see something on the other side but you can't "+COLORS.UNDERLINE+"quite"+COLORS.END+" make it out",
+                    "hit": "You splash the pond water!",
+                    "sniff": "Smells like water!"
+                },
+                trigger_text="You spot something in the grass across the pond! You slip and fall into the pond and scramble out on the other side, where you only find a leaf in the wind. Now you're grumpy!",
+                remove_self=False,
+                on_trigger=[["player", "enter", "dummy"],
+                            ["player", "apply_item", "grumpy"]]
+
+            )
+        }
     )
 }

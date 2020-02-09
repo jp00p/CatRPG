@@ -52,17 +52,18 @@ class Room:
             elist = self.events.keys()
         return elist
 
-    def describe(self, worldMap, npcList):
+    def describe(self, worldMap, npcList, player):
         # cls()
         area_desc = self.description
         if(self.state != 0 and self.states):
             area_desc += "\n"+self.states[self.state]
         if(self.npc != ""):
-            area_desc += "\n"+npcList[self.npc].desc
-        for i in self.get_event_list():
-            # i == tree, eg
-            keyword = "{}{}{}".format(COLORS.BOLD, i, COLORS.END)
-            area_desc = area_desc.replace(i, keyword)
+            area_desc += "\n\n"+COLORS.BOLD+npcList[self.npc].desc+COLORS.END+"\n"
+        if(player.curiosity >= 6):
+            for i in self.get_event_list():
+                # i == tree, eg
+                keyword = "{}{}{}".format(COLORS.BOLD, i, COLORS.END)
+                area_desc = area_desc.replace(i, keyword)
         #print(area_desc)  # , title=self.name)
         #exits = self.show_exits(worldMap)
         #print("\nExits:\n{}".format(exits))

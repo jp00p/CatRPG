@@ -44,6 +44,42 @@ gameMonsters = {
     "fer": 0,
     "acr" : 0
   },
+  "housemouse" : {
+    "name" : "House Mouse",
+    "moves" : ["nibble", "squeak"],
+    "hp" : 13,
+    "xp_given" : 3,
+    "drop" : ["catnip", 25],
+    "fer" : 2,
+    "acr" : 2
+  },
+  "rat" : {
+    "name" : "Rat",
+    "moves" : ["nibble", "squeak", "bite"],
+    "hp" : 20,
+    "xp_given" : 5,
+    "drop" : False,
+    "fer" : 4,
+    "acr" : 3
+  },
+  "bat": {
+    "name" : "Bat",
+    "moves" : ["swoop", "squeak"],
+    "hp" : 12,
+    "xp_given" : 2,
+    "drop" : False,
+    "fer" : 0,
+    "acr" : 2
+  },
+  "bigbat": {
+    "name" : "Big Bat",
+    "moves" : ["swoop", "squeak", "claw"],
+    "hp" : 18,
+    "xp_given" : 5,
+    "drop" : False,
+    "fer" : 1,
+    "acr" : 4
+  },
   "rabbit" : {
     "name" : "Bunny",
     "moves" :["bunny"],
@@ -58,13 +94,22 @@ gameMonsters = {
     "moves" :["slither","hiss"],
     "hp" : 15,
     "xp_given" : 3,
-    "drop" : ["snake hat", 30],
+    "drop" : ["snake hat", 25],
     "fer": 0,
     "acr" : 0
   },
+  "fish" : {
+    "name" : "Fish",
+    "moves" : ["splash"],
+    "hp" : 6,
+    "xp_given" : 2,
+    "drop" : ["fish hat", 25],
+    "fer" : 0,
+    "acr" : 2
+  },
   "streetcat" : {
     "name" : "Streetcat",
-    "moves" :["bite","claw","kick"],
+    "moves" :["bite","claw","kick","barf"],
     "hp" : 15,
     "xp_given" : 3,
     "drop" : ["cat ears", 10],
@@ -79,7 +124,6 @@ gameMonsters = {
     "drop" : False,
     "fer": 0,
     "acr" : 0
-  }
-  
+  },
 }
 mlist = gameMonsters.keys()

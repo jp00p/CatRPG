@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import print_function, division
 import cmd
 import textwrap
 import sys
@@ -7,10 +7,20 @@ import time
 import string
 import platform
 import copy
+
+
 from random import seed, randint, randrange, choice, sample
 from pyfiglet import Figlet
 from colorama import init, Fore, Back, Style
 from termcolor import colored
+
+from asciimatics.effects import Scroll, Mirage, Wipe, Cycle, Matrix, \
+    BannerText, Stars, Print
+from asciimatics.particles import DropScreen
+from asciimatics.renderers import FigletText, SpeechBubble, Rainbow, Fire
+from asciimatics.scene import Scene
+from asciimatics.screen import Screen
+
 import world
 import character
 import items
@@ -23,9 +33,8 @@ npcList = world.npcList
 gameMonsters = character.gameMonsters
 
 
-
-
 init(autoreset=True)
+
 
 class COLORS:
     PURPLE = '\033[95m'
@@ -39,10 +48,12 @@ class COLORS:
     UNDERLINE = '\033[4m'
     END = '\033[0m'
 
+
 # Utility functions
 screen_width = 79
 text_wrapper = textwrap.TextWrapper(width=screen_width-4)
 # works in IE6
+
 
 def cls():
     operating_system = platform.system()
@@ -79,35 +90,39 @@ def centered(text):
     print(final)
 
 
-def print_msg_box(content,title="",align="center",ret=False):
+def print_msg_box(content, title="", align="center", ret=False, width=screen_width, joinchar="\n", format=True):
     if(title != ""):
         title = (" "+COLORS.BOLD+title+COLORS.END+" ")
 
     title_len = len(title)
-    leftover_space = (screen_width+6)-title_len  # adding 6 for the BOLD
-    
-    tspacer="-"*round(leftover_space/2)
+    leftover_space = (width+6)-title_len  # adding 6 for the BOLD
+
+    tspacer = "-"*round(leftover_space/2)
 
     tl = "+"
     tc = title
     tr = "+"
 
     spacel = "|"
-    spacec = " "*(screen_width-2)
+    spacec = " "*(width-2)
     spacer = "|"
     space = ("\n"+spacel+spacec+spacer+"\n")
 
-    lines = textwrap.wrap(content, screen_width-8)
-    if(align=="center"):
-        cc = "\n".join(line.center(screen_width-2) for line in lines)
-    elif(align=="left"):
-        cc = "\n".join(textwrap.indent(line, "    ") for line in lines)
-        
-    elif(align=="none"):
+    lines = textwrap.wrap(content, width-8)
+
+    if(format != True):
         cc = content
+    else:
+        if(align == "center"):
+            cc = joinchar.join(line.center(width-2) for line in lines)
+        elif(align == "left"):
+            cc = joinchar.join(textwrap.indent(line, "    ") for line in lines)
+
+        elif(align == "none"):
+            cc = content
 
     bl = "+"
-    bc = "-"*(screen_width-2)
+    bc = "-"*(width-2)
     br = "+"
 
     box = (tl+tspacer+tc+tspacer+tr+space+cc+space+bl+bc+br)
@@ -180,6 +195,7 @@ class Character:
         time.sleep(0.5)
         cls()
 
+
 class Enemy(Character):
     def __init__(self, hp=0, xp_given=1, drop=False, **kwargs):
         super().__init__(**kwargs)
@@ -208,14 +224,14 @@ class Player(Character):
         self.learned_moves = {
             2: moveList["slap"],
             4: moveList["doubleclaw"],
-            #7: moveList["meow"]
+            # 7: moveList["meow"]
         }
+
     def hp_max(self, SET_MAX=False):
-        #make sure you dont go over max hp
-        #or just set it to max
+        # make sure you dont go over max hp
+        # or just set it to max
         if(self.hp > self.max_hp or SET_MAX):
             self.hp = self.max_hp
-        
 
     def give_hp(self, hp):
         self.hp += hp
@@ -252,6 +268,8 @@ class Player(Character):
 
     def give_items(self, items):
         for item in items:
+            if(type(item) == str):
+                item = gameItems[item]
             print("You got a {}".format(item.name))
             if(item.item_type == "hat" and item in self.items):
                 print("You don't need two of those!")
@@ -304,9 +322,13 @@ class Player(Character):
 
     def list_items(self):
         _items = ""
-        for i in range(len(self.items)):
-            _items += self.items[i].name + ", "
-        return _items[:-2]
+        numitems = {}
+        for i in set(self.items):
+            numitems[i.name] = self.items.count(i)
+        _items = numitems
+        #for i in list(numitems.keys):
+            #_items += "{}({}), ".format(gameItems[i].name, numitems[i])
+        return _items #[:-2]
 
     # for battle screen input
     def list_attacks(self):
@@ -320,7 +342,6 @@ class Player(Character):
         for move in self.moves:
             _moves += move.name + ", "
         return _moves[:-2]
-            
 
     def get_hat(self):
         if(self.hat == None):
@@ -334,11 +355,20 @@ class Player(Character):
         else:
             return self.attitude.name
 
+    def clear_attitude(self):
+        attitude = self.attitude
+        self.attitude = None
+        self.ferocity -= attitude.fer
+        self.acrobatics -= attitude.fer
+        self.curiosity -= attitude.cur
+        self.max_hp -= attitude.max_hp
+        self.hp_max()
+
     def show_status(self):
         cls()
         title = "{} the {}".format(self.name.capitalize(), self.breed)
-        status =  "    Level: {}\n".format(self.level)
-        status += "    Attitude: {}\tHat: {}\n".format(
+        status = "    Level: {}\n".format(self.level)
+        status += "    Attitude: {:12}\tHat: {:12}\n".format(
             self.get_attitude(), self.get_hat())
         status += "    HP: {}/{}\tXP: {}/{}\n".format(
             self.hp, self.max_hp, self.xp, self.required_xp())
@@ -357,33 +387,34 @@ class Player(Character):
             print("You can't go that way")
             return False
 
-    def enter(self, room):
+    def enter(self, room="dummy"):
         if(type(room) == str):
-            room = world.worldMap[room]
+            room = worldMap[room]
         self.location = room.id
         # tick the npcs each time you move
-        tickmap = copy.deepcopy(world.worldMap) # don't iterate the current map, we'll get duplicate npcs        
+        # don't iterate the current map, we'll get duplicate npcs
+        tickmap = copy.deepcopy(world.worldMap)
         for i in tickmap:
             i = tickmap[i]
             if(i.npc != ""):
-                npcList[i.npc].tick()
-        self.look(world.worldMap[self.location])
+                npcList[i.npc].tick(worldMap)
+        self.look(worldMap[self.location])
+
     def look(self, room):
         exit_dirs = {0: "North", 1: "East", 2: "South", 3: "West"}
         describe = world.worldMap[self.location].describe(
-                                worldMap, npcList)
+            worldMap, npcList, self)
         print_msg_box(describe["desc"], describe["title"], align="left")
         if(describe["exits"] != False):
             exits = ""
             for dir in list(exit_dirs.keys()):
                 if(describe["exits"][dir] is not False):
-                    exits += "    {}: {}\n".format(exit_dirs[dir], world.worldMap[describe["exits"][dir]].name)
-            print_msg_box(exits, "Exits", align="none")
+                    exits += "    {}: {}\n".format(
+                        exit_dirs[dir], world.worldMap[describe["exits"][dir]].name)
+            print_msg_box(exits[:-1], "Exits", align="none", width=41)
 
-
-    # rest your weary head
     def rest(self):
-        if(self.location == "start4"):
+        if(self.location == "start4"):  # free rest at the starting area
             self.hp = self.max_hp
             cls()
             speak("You take a nice nap in the comfort of your own yard.")
@@ -391,7 +422,7 @@ class Player(Character):
             time.sleep(1)
             return
         else:
-            print("You will lose up to {} XP when resting.  You won't lose any levels or stats.\nAll of your HP will be restored.".format(self.level))
+            print("You will lose up to {} XP when resting outside of your own yard. Your attitude will also be reset to normal. You won't lose any levels or stats.\nAll of your HP will be restored.".format(self.level))
             print("Rest? (y/n)")
             action = input("?> ")
             action = str(action).lower()
@@ -402,6 +433,7 @@ class Player(Character):
                     self.xp -= loss
                     if(self.xp < 0):
                         self.xp = 0
+                    self.clear_attitude()
                     print("Your HP is refilled!\nHowever, you lost {} XP.  Your total XP is now: {}".format(
                         loss, self.xp))
                 else:
@@ -426,13 +458,17 @@ class Player(Character):
             if(self.battle(enemy)):
                 victory = ["Victory!", "You are the ultimate hunter!",
                            "You have emerged victorious!", "You are master of the hunt!", "Your prey runs away scared!"]
-                print(choice(victory))
+                speak(choice(victory))
+                anykey()
             else:
-                print("You are too tired for hunting now. You need to rest.")
+                speak("You are too tired for hunting now. You need to rest or heal.")
+                time.sleep(2)
             del enemy
         else:
             print("There doesn't seem to be anything to hunt around here.")
-    def use_item(self,item):
+            time.sleep(1)
+
+    def use_item(self, item):
         if(type(item) is str):
             if(item in list(items.gameItems.keys())):
                 item = items.gameItems[item]
@@ -446,12 +482,12 @@ class Player(Character):
             print("You can't use that!")
             return
         else:
-            item.use(self,world.worldMap)
+            item.use(self, world.worldMap)
             self.items.remove(item)
             print(item.use_text)
-        
 
     def level_up(self):
+        cls()
         print("DING!  Level up!  GRATTIES!")
         print("Choose an attribute to level up:")
         print("1. Ferocity: {}\n2. Acrobatics: {}\n3. Curiosity: {}".format(
@@ -482,6 +518,9 @@ class Player(Character):
             self.level_up()
 
     def battle(self, enemy):
+        '''
+        Battle time!
+        '''
         cls()
         victory = True
         turn = 1
@@ -497,28 +536,30 @@ Your prey is: {}
 +-------- Moves -------+
 {}========================
 '''
-        
+
         while(self.hp > 0 and enemy.hp > 0):
             player_hp_str = colored(str(self.hp), 'green')
             enemy_hp_str = colored(str(enemy.hp), 'red')
-            print(_battle_screen.format(enemy.name, player_hp_str, enemy_hp_str, self.list_attacks()))
-            
+            print(_battle_screen.format(enemy.name, player_hp_str,
+                                        enemy_hp_str, self.list_attacks()))
+
             # player turn
             if(enemy.hp > 0):
-                #print(self.list_attacks())
-                attack_choice = input("?> ")  # 1 or 2 or 3
+                # print(self.list_attacks())
+                attack_choice = input("?> ")
                 while(attack_choice.isdigit() == False or int(attack_choice) > len(self.moves)):
                     print("Try that again")
-                    attack_choice = input("?> ")  # 1 or 2 or 3
+                    attack_choice = input("?> ")
                 self.attack(enemy, self.moves[int(attack_choice)-1])
 
             if(enemy.hp > 0):
                 enemy.attack(self, choice(enemy.moves))
                 if(self.hp <= 0):
                     return False
-                    ### END OF COMBAT
+                    # END OF COMBAT
             turn += 1
-            
+        time.sleep(1)
+        cls()
         victory = True
         self.xp += enemy.xp_given
         d100 = randint(1, 100)
@@ -553,7 +594,8 @@ class Game():
         self.turn = 0
         self.exit_dirs = {0: "North", 1: "East", 2: "South", 3: "West"}
         self.acceptable_verbs = ["move", "go", "look", "inspect", "lay", "lie", "examine", "hunt",
-                                 "sniff", "smell", "equip", "status", "rest", "sleep", "climb", "help", "talk", "speak", "hit", "paw", "push", "use", "take", "get", "grab"]
+                                 "sniff", "smell", "equip", "status", "rest", "sleep", "climb", "help",
+                                 "talk", "speak", "hit", "paw", "push", "use", "take", "get", "grab"]
         self.up_dir = ["up", "u", "n", "north"]
         self.down_dir = ["down", "d", "s", "south"]
         self.left_dir = ["left", "l", "w", "west"]
@@ -569,7 +611,7 @@ class Game():
 
     def prompt(self):
         if(self.turn == 999):
-            print("Game over! You took too long to make friends.")
+            self.game_over()
             return
         print(" {:2d}                           ".format(self.turn))
         print("┍━━━━━━━━━━━━━━✿━━━━━━━━━━━━━━━┑")
@@ -580,11 +622,21 @@ class Game():
         self.parse_input(action.lower())
         self.prompt()  # loopback
 
+    def game_over(self):
+        cls()
+        custom_fig = Figlet(font='univers')
+        print(custom_fig.renderText('Game Over'))
+        print("You took too long to make friends!")
+        time.sleep(1)
+        anykey()
+        self.show_title_screen()
+
     def parse_input(self, action):
         if(action == ""):
             print("Invalid action")
             pass
         else:
+
             action = action.split()
             stopwords = ['at', 'the', 'my', 'a', 'to', 'up', 'down', 'on']
             verb = action[0]
@@ -598,9 +650,12 @@ class Game():
                     if word in stopwords:
                         action.remove(word)
                 noun = " ".join(action)
-
-            if verb in self.acceptable_verbs:
+            if(verb == "teleport"):
+                self.player.enter(noun)
+                pass
+            elif (verb in self.acceptable_verbs):
                 # handle specific verbs
+                cls()
                 self.turn += 1
                 if(verb in ["rest", "sleep"]):
                     self.player.rest()
@@ -623,9 +678,21 @@ class Game():
                     self.player.try_move(
                         world.worldMap[self.player.location], direction)
                 if(verb in ["look", "inspect", "examine", "lay", "lie", "sniff", "smell", "climb", "take", "get", "grab", "hit", "paw", "push"]):
+                    if(verb in ["hit", "push"]):
+                        verb = "hit"
+                    if(verb in ["sniff", "smell"]):
+                        verb = "sniff"
+                    if(verb in ["lay", "lie"]):
+                        verb = "lay"
+                    if(verb in ["take", "get"]):
+                        verb = "take"
+                    if(verb in ["look", "inspect", "examine"]):
+                        verb = "look"
+
                     if(noun not in room_events and noun == ""):
-                        if(verb in ["look", "inspect", "examine"]):
-                            self.player.look(world.worldMap[self.player.location]) 
+                        if(verb == "look"):
+                            self.player.look(
+                                world.worldMap[self.player.location])
                             pass
                     elif(noun not in room_events and noun != ""):
                         print(
@@ -641,6 +708,7 @@ class Game():
                     pass
                 if(verb == "hunt"):
                     self.player.hunt(world.worldMap[self.player.location])
+                    self.player.look(world.worldMap[self.player.location])
                     pass
                 if(verb == "status"):
                     self.player.show_status()
@@ -667,42 +735,100 @@ class Game():
 
     def show_help_screen(self, prompt=False):
         cls()
-        print("= Help =")
-        print(" In this game, you are a cat. ")
-        print(" Your goal is to find and befriend all 7 cats in the neighborhood. ")
-        print(" Navigate by typing \"move east\" or \"go north\"")
-        print(" You can just use the letters \"n e s w\" instead of the whole diretion ")
-        print(" Type \"look\" to get a description of the area you're in ")
-        print(" Type \"look tree\" to look at a tree in the area")
-        print(" There are some other actions to discover too:  sniff, climb, paw... ")
-        print(" Type \"hunt\" to hunt for local wildlife and raise your skills!")
-        print(" Level up your stats to unlock more stuff! ")
-        print(" Type \"status\" to view your status ")
-        print(" Collect fun hats and \"equip\" them! Even though you don't have thumbs. ")
-        print(" Your attitude can change as well, just like a real cat. ")
-        print(" Type \"rest\" if your HP is low or 0. You will lose XP equal to your level (but you won't lose levels)")
-        print(" Making a map on paper is recommended! ")
+        help_str = ""
+        help_str += "In this game, you are a cat.\n"
+        help_str += "Your goal is to find and befriend all 7 cats in the neighborhood.\n"
+        help_str += "Navigate by typing \"move east\" or \"go north\".  \n"
+        help_str += "You can just use the letters \"n e s w\" instead of the whole diretion.  \n"
+        help_str += "Type \"look\" to get a description of the area you're in.  \n"
+        help_str += "Type \"look tree\" to look at a tree in the area.  \n"
+        help_str += "There are some other actions to discover too:  sniff, climb, hit...   \n"
+        help_str += "Type \"hunt\" to hunt for local wildlife and raise your skills!  \n"
+        help_str += "Level up your stats to unlock more stuff!.  \n"
+        help_str += "Type \"status\" to view your status.  \n"
+        help_str += "Collect fun hats and \"equip\" them! Even though you don't have thumbs. \n"
+        help_str += "Your attitude can change as well, just like a real cat.  \n"
+        help_str += "Type \"rest\" if your HP is low or 0. You will lose XP equal to your level (but you won't lose levels).  \n"
+        help_str += "If you take too long to make friends, the cats won't trust you and you'll have to start over!\n"
+        help_str += "Making a map on paper is recommended!. There is no saving your game (yet)\n"
+        help_str += "This is the complete list of of verbs allowed in this game (some are synonyms): {}".format(
+            self.acceptable_verbs)
+        print("---- Game Help ----")
+        print(help_str)
         anykey()
         if(prompt):
             self.prompt()
         else:
             self.show_title_screen()
 
+    def title_screen_graphics(self, screen):
+        effects = [
+            Cycle(
+                screen,
+                FigletText("Cat", font='univers'),
+                screen.height // 2 - 8),
+            Cycle(
+                screen,
+                FigletText("Quest", font='univers'),
+                screen.height // 2 + 3),
+            Stars(screen, (screen.width + screen.height) // 2)
+        ]
+        screen.play([Scene(effects, 66)], repeat=False)
+
     def show_title_screen(self):
         cls()
-        custom_fig = Figlet(font='univers')
-        print(custom_fig.renderText('Meow'))
+        Screen.wrapper(self.title_screen_graphics)
         self.title_screen_select()
+        
+    def intro_screen(self,screen):
+        scenes = []
+        effects = [
+            #Scroll(screen, 3),
+            Mirage(
+                screen,
+                FigletText("A long time ago", font='starwars'),
+                screen.height,
+                Screen.COLOUR_YELLOW),
+            Mirage(
+                screen,
+                FigletText("In a yard far away", font='starwars'),
+                screen.height + 8,
+                Screen.COLOUR_YELLOW),
+        ]
+        scenes.append(Scene(effects, (screen.height + 104) * 3))
+        
+        effects = [
+            Cycle(
+                screen,
+                FigletText("MEOW", font='big'),
+                screen.height // 2 - 8,
+                stop_frame=100),
+            Cycle(
+                screen,
+                FigletText("HISS!!!", font='big'),
+                screen.height // 2 + 3,
+                stop_frame=100),
+            Stars(screen, (screen.width + screen.height) // 2, stop_frame=100),
+            DropScreen(screen, 100, start_frame=100)
+        ]
+        scenes.append(Scene(effects, 200))
+
+        effects = [
+            Print(screen,
+                SpeechBubble("Press 'X' to exit."), screen.height // 2 - 1, attr=Screen.A_BOLD)
+        ]
+        scenes.append(Scene(effects, -1))
+
+        screen.play(scenes, stop_on_resize=True)
 
     def title_screen_select(self):
-        print_msg_box("Type: play, help or quit","Make your choice meow")
+        print_msg_box("Type: play, help or quit", "Make your choice meow")
         action = str(input("?> "))
         action = action.lower()
         if(action in self.title_choices):
             if action == "play":
                 cls()
-                speak("Time to be a cat! TODO: Put an intro here")
-                time.sleep(1)
+                Screen.wrapper(self.intro_screen)
                 cls()
                 self.character_creation()
             if action == "quit":
@@ -719,7 +845,7 @@ class Game():
         breed_data = "\n"
         for i in range(len(breedList)):
             breed_data += "    {}  {} - {}\n".format(str(i+1),
-                                                 breedList[i].name, breedList[i].desc)
+                                                     breedList[i].name, breedList[i].desc)
         print_msg_box(breed_data, "Pick a Breed", align="none")
         print("\n")
         print("Type the corresponding number:")
@@ -754,7 +880,7 @@ class Game():
             if(confirm.lower() in ["yes", "", "y"]):
                 stats = breed.stats
 
-                ### NEW CHARACTER STATS
+                # NEW CHARACTER STATS
                 p = Player(
                     breed=breed_name,
                     name=name.capitalize(),
@@ -762,7 +888,8 @@ class Game():
                     acr=stats[1],
                     cur=stats[2],
                     moves=[moveList["kick"], moveList["bite"]],
-                    items=[gameItems["top hat"],gameItems["potion"], gameItems["gold star"]]
+                    items=[gameItems["top hat"],
+                           gameItems["potion"], gameItems["gold star"]]
                 )
                 self.player = p
                 print(self.player.name + " is ready to play")
@@ -771,7 +898,6 @@ class Game():
                 self.enter_starting_location()
             else:
                 self.character_creation()
-            
 
     def enter_starting_location(self):
         cls()

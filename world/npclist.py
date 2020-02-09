@@ -14,6 +14,42 @@ npcList = {
       1 : "Momo asks: Have you got that gogurt yet?",
       2 : "Momo likes that gogurt!"
     }
+  ),
+  "mochi" : npc.NPC(
+    name="Mochi",
+    location="porch",
+    path=["porch", "fyard2", "fyard1", "fyard3", "fyard4"],
+    desc="A cutie chunky tuxedo baby who likes to hang out around the front porch. He looks hungry, as usual!",
+    thanks="Mochi says thank you! Then he begins searching for more food.",
+    quest_type="item",
+    required = ["mochifood", 5],
+    states = {
+      0: "Mochi is starving! He needs 5 bags of food, now! He thinks he saw some in the backyard."
+    }
+  ),
+  "mori" : npc.NPC(
+    name="Mori",
+    location="basement1"
+  ),
+  "mika" : npc.NPC(
+    name="Mika",
+    location="roof",
+    path=False
+  ),
+  "morty" : npc.NPC(
+    name="Mortimer",
+    location="byard1",
+    path=False #["byard1","byard5","byard6","byard2","byard3","byard7","byard8","byard4"]
+  ),
+  "dorian" : npc.NPC(
+    name="Dorian",
+    location="house1",
+    path=["house1","house2","house3","house4"]
+  ),
+  "moreau" : npc.NPC(
+    name="Moreau",
+    location="alley1",
+    path=False
   )
 }    
     
