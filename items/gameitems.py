@@ -3,13 +3,14 @@ from . import item
 
 gameItems = {
 
-    "grumpy":      item.Item("Grumpy", 5, 0, 0, 0, item_type="attitude"),
-    "zoomy":       item.Item("Zoomy", 0, 5, 0, 0, item_type="attitude"),
-    "inquisitive": item.Item("Inquisitive", 0, 0, 5, 0, item_type="attitude"),
+    "grumpy":      item.Item("Grumpy", 3, 0, -1, 0, item_type="attitude"),
+    "zoomy":       item.Item("Zoomy", -1, 3, 0, 0, item_type="attitude"),
+    "inquisitive": item.Item("Inquisitive", -1, 0, 3, 0, item_type="attitude"),
     "brave":       item.Item("Brave", 5, 0, 0, 0, item_type="attitude"),
     "sleepy":      item.Item("Sleepy", -1, -2, -1, 0, item_type="attitude"),
-    "stinkyface":  item.Item("Stinkyface", -1, -1, 3, 0, item_type="attitude", move="barf"),
-    "nostalgic":   item.Item("Nostalgic", 0, 0, 0, 15, item_type="attitude"),
+    "stinkyface":  item.Item("Stinkyface", -1, -1, 2, 0, item_type="attitude", move="barf"),
+    "nostalgic":   item.Item("Nostalgic", 0, 0, 0, 25, item_type="attitude"),
+    "batsense":    item.Item("Bat Senses", 0, 0, 5, 0, item_type="attitude"),
 
     "top hat":      item.Item("Top Hat", 3, 3, 3, 15, item_type="hat"),
     "bunny ears":   item.Item("Bunny Ears", 0, 0, 10, 0, item_type="hat", move="bunny"),
@@ -17,6 +18,8 @@ gameItems = {
     "snake hat":    item.Item("Snake Hat", 5, 0, 0, 15, item_type="hat", move="hiss"),
     "fish hat":     item.Item("Fish Hat", 0, 5, 0, 0, item_type="hat", move="splash"),
     "bat hat":      item.Item("Bat Hat", 0, 1, 2, 5, item_type="hat", move="squeak"),
+    "ferret hat":   item.Item("Ferret Hat", 1, 1, 1, 0, item_type="hat", move="dance"),
+    "mushroom hat": item.Item("Mushroom Hat", 0, 0, 0, 50, item_type="hat", move="shroom"),
 
     "gogurt":  item.Item("Gogurt", item_type="quest"),
     "sweater": item.Item("Sweater", item_type="quest"),
@@ -46,6 +49,12 @@ gameItems = {
         item_type="usable",
         item_effect=[["player", "apply_item", "zoomy"]],
         use_text="You roll around in the catnip and get the zoomies!"
+    ),
+    "batnip": item.Item(
+        name="Batnip",
+        item_type="usable",
+        item_effect=[["player", "apply_item", "batsense"]],
+        use_text="You sniff the batnip and your hearing suddenly improves!"
     ),
     "scratcher": item.Item(
         name="Scratching Post",

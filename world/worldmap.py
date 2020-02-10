@@ -52,7 +52,6 @@ worldMap = {
             1: "Seems to be a popular spot for local cats to hunt.  A tall fence blocks your passage to the south. Your fallen foe, the stick, lies to the north."
         },
         events={
-            "potion": potion,
             "stick": event.Event(
                 reqs={
                     "stat": "ferocity",
@@ -61,8 +60,9 @@ worldMap = {
                 },
                 descs={"sniff": "The stick smells sticky.",
                        "look": "A strong cat could hit this stick away!",
-                       "hit": "You hit the stick with all your cat strength, but it's not enough."},
-                trigger_text="You swipe at the stick and it clatters to the ground, startling you, but revealing a path to the north.",
+                       "take": "You can't take it!",
+                       "hit": "You hit the stick with all your cat strength, but you're just not strong enough yet."},
+                trigger_text="You swipe at the stick and it clatters to the ground, startling you! It also reveals a path to the north.",
                 remove_self=True,
                 on_trigger=[["room", "set_exits", ["fyard4", "start2", False, False]], 
                             ["room", "set_state", 1]],
@@ -89,11 +89,12 @@ worldMap = {
                     "trigger": "look"
                 },
                 descs={"sniff": "The road doesn't smell like anything.",
-                       "look": "The first step is looking, but you're not fast enough."},
-                trigger_text="You naughtily dash across the street! There's a way north here!",
+                       "hit":"Hit the road Jack!",
+                       "look": "The first step is looking both ways, but you're not fast enough to dash across yet."},
+                trigger_text="You naughtily dash across the street! Luckily there's no cars allowed on this street.",
                 remove_self=True,
                 on_trigger=[["room", "set_exits", ["driveway", False, "start3", "start1"]], [
-                    "room", "set_state", 1]],
+                    "room", "set_state", 1], ["player", "enter", "driveway"]],
                 e_type="text"
             )
         }
@@ -179,10 +180,28 @@ worldMap = {
         room_id="start6",
         name="Parking Lot",
         area="Outskirts",
-        description="A small parking lot near a neighborhood shop, where the more rough and tumble street cats like to meet up.  Be careful hunting on their turf, you might run into one!",
+        description="A small parking lot near a neighborhood shop. This is where the more rough and tumble street cats like to meet up.  Be careful hunting on their turf, you might run into one!  There's a dumpster behind the shop ",
         exits=["start3", False, False, "start5"],
         enemies=["squirrel", "mouse", "streetcat"],
-        random_battle=True
+        random_battle=True,
+        states= {
+            1: "A small parking lot near a neighborhood shop. This is where the more rough and tumble street cats like to meet up.  Be careful hunting on their turf, you might run into one!"
+        },
+        events={
+            "dumpster": event.Event(
+                reqs={
+                    "stat" : "acrobatics",
+                    "value" : 5,
+                    "trigger" : "look"
+                },
+                descs={"look": "It's too hard for you to balance on the edge to look inside!",
+                       "sniff": "Smells like garbage! And fish..."},
+                trigger_text="You balance on the edge and look inside... you find a tuna fish!",
+                remove_self=True,
+                on_trigger=[["player", "give_items", ["tuna"]],
+                            ["room", "set_state", 1]]
+            )
+        }
     ),
     "fyard1": room.Room(
         room_id="fyard1",
@@ -234,10 +253,69 @@ worldMap = {
     ),
     "fyard3": room.Room(
         room_id="fyard3",
-        name="Leafy Pile",
-        description="A huge leafy pile of leaves! The local cats like to bury stuff over here.",
+        name="Mushroom Circle",
+        description="A circle of colorful mushrooms in the corner of the yard. There's some red, blue, and green mushrooms mixed in.",
         area="Front Yard",
-        exits=["fyard1", "fyard4", False, False]
+        exits=["fyard1", "fyard4", False, False],
+        events={
+            "mushroom":event.Event(
+                reqs={
+                    "stat":"acrobatics",
+                    "value":999,
+                    "trigger":"look"
+                },
+                descs={"sniff":"Which mushroom are you trying to sniff?", "look":"Which mushroom are you looking at?"},
+                trigger_text="",
+                remove_self=False
+            ),
+            "mushrooms":event.Event(
+                reqs={
+                    "stat":"acrobatics",
+                    "value":999,
+                    "trigger":"look"
+                },
+                descs={"sniff":"Which mushroom are you trying to sniff?", "look":"Which mushroom are you looking at?"},
+                trigger_text="",
+                remove_self=False
+            ),
+            "red mushroom":event.Event(
+                reqs={
+                    "stat":"curiosity",
+                    "value":11,
+                    "trigger":"sniff"
+                },
+                descs={"sniff":"Smells mysterious...", "look":"It's covered in a fine shiny red powder.", "hit":"The mushroom is too delicate for that!"},
+                trigger_text="Sniffing the mushroom makes you feel stronger! You sniff it until the mushroom falls apart.",
+                remove_self=True,
+                on_trigger=[["player", "add_stat", ["fer", 3]]]
+            ),
+            "green mushroom":event.Event(
+                reqs={
+                    "stat":"ferocity",
+                    "value":6,
+                    "trigger":"hit"
+                },
+                descs={"sniff":"Smells healthy!", "hit":"You hit the mushroom and hear something rattling inside. Hit it harder!", "look":"This mushroom looks like its full of something..."},
+                trigger_text="You hit the mushroom as hard as you can and a bunch of potions spill out!",
+                remove_self=True,
+                on_trigger=[["player", "give_items", ["potion","potion","potion"]]]
+            ),
+            "blue mushroom":event.Event(
+                reqs={
+                    "stat":"acrobatics",
+                    "value":8,
+                    "trigger":"climb"
+                },
+                descs={
+                    "sniff":"This tall mushroom smells very mushroomy",
+                    "look":"This mushroom is super tall! You can't see on top of it",
+                    "climb":"You don't have the skills to climb this mushroom... yet"
+                },
+                trigger_text="You climb up the slimy blue mushroom and find a Mushroom Hat on top!",
+                remove_self=True,
+                on_trigger=[["player", "give_items", ["mushroom hat"]]]
+            )
+        }
     ),
     "fyard4": room.Room(
         room_id="fyard4",

@@ -224,7 +224,7 @@ class Player(Character):
         self.learned_moves = {
             2: moveList["slap"],
             4: moveList["doubleclaw"],
-            # 7: moveList["meow"]
+            6: moveList["pounce"],
         }
 
     def hp_max(self, SET_MAX=False):
@@ -325,7 +325,7 @@ class Player(Character):
         numitems = {}
         for i in set(self.items):
             numitems[i.name] = self.items.count(i)
-        _items = numitems
+            _items += "{} x{}, ".format(i.name, self.items.count(i))
         #for i in list(numitems.keys):
             #_items += "{}({}), ".format(gameItems[i].name, numitems[i])
         return _items #[:-2]
@@ -378,7 +378,14 @@ class Player(Character):
         status += "    Items: {}".format(self.list_items())
         print_msg_box(status, title, align="none")
         #print("DEBUG:Quest Items:{}\nQuest Monsters:{}\nQuest Kills:{}\n".format(self.quest_items, self.quest_monsters, self.kills))
-
+    def add_stat(self,give=["cur",0]):
+        if(give[0]=="cur"):
+            self.curiosity += give[1]
+        if(give[0]=="acr"):
+            self.acrobatics += give[1]
+        if(give[0]=="fer"):
+            self.ferocity += give[1]
+        
     def try_move(self, curRoom, direction):
         # dirs = { 0:"North", 1:"East", 2:"South", 3:"West" }
         if(curRoom.exits[direction] != False):
@@ -404,6 +411,7 @@ class Player(Character):
         exit_dirs = {0: "North", 1: "East", 2: "South", 3: "West"}
         describe = world.worldMap[self.location].describe(
             worldMap, npcList, self)
+        print(centered("  "+COLORS.PURPLE+describe["area"]+COLORS.END+"  "))
         print_msg_box(describe["desc"], describe["title"], align="left")
         if(describe["exits"] != False):
             exits = ""
@@ -783,52 +791,36 @@ class Game():
     def intro_screen(self,screen):
         scenes = []
         effects = [
-            #Scroll(screen, 3),
+            Scroll(screen, 3),
             Mirage(
                 screen,
-                FigletText("A long time ago", font='starwars'),
+                FigletText("A long time ago...", font='starwars'),
                 screen.height,
                 Screen.COLOUR_YELLOW),
             Mirage(
                 screen,
-                FigletText("In a yard far away", font='starwars'),
+                FigletText("In a yard far, far away", font='starwars'),
                 screen.height + 8,
                 Screen.COLOUR_YELLOW),
         ]
         scenes.append(Scene(effects, (screen.height + 104) * 3))
-        
         effects = [
-            Cycle(
-                screen,
-                FigletText("MEOW", font='big'),
-                screen.height // 2 - 8,
-                stop_frame=100),
-            Cycle(
-                screen,
-                FigletText("HISS!!!", font='big'),
-                screen.height // 2 + 3,
-                stop_frame=100),
-            Stars(screen, (screen.width + screen.height) // 2, stop_frame=100),
-            DropScreen(screen, 100, start_frame=100)
+            Scroll(screen, 3),
+            Print(screen, SpeechBubble("Press X to continue"), screen.height+12, Screen.COLOUR_CYAN)
         ]
-        scenes.append(Scene(effects, 200))
-
-        effects = [
-            Print(screen,
-                SpeechBubble("Press 'X' to exit."), screen.height // 2 - 1, attr=Screen.A_BOLD)
-        ]
-        scenes.append(Scene(effects, -1))
-
-        screen.play(scenes, stop_on_resize=True)
+        scenes.append(Scene(effects, 300, clear=True))
+        screen.play(scenes, stop_on_resize=True, )
 
     def title_screen_select(self):
         print_msg_box("Type: play, help or quit", "Make your choice meow")
         action = str(input("?> "))
         action = action.lower()
         if(action in self.title_choices):
-            if action == "play":
+            if action == "play":              
+                #Screen.wrapper(self.intro_screen)
                 cls()
-                Screen.wrapper(self.intro_screen)
+                print_msg_box("Lorem ipsum intro text can go here.", "Title Goes here", align="center")
+                anykey()
                 cls()
                 self.character_creation()
             if action == "quit":

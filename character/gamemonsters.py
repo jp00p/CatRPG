@@ -4,7 +4,7 @@ gameMonsters = {
     "moves" :["peck","swoop"],
     "hp" : 5,
     "xp_given" : 1,
-    "drop" : False,
+    "drop" : ["potion", 15],
     "fer": 0,
     "acr" : 0
   },
@@ -13,7 +13,7 @@ gameMonsters = {
     "moves" :["peck","swoop"],
     "hp" : 10,
     "xp_given" : 2,
-    "drop" : False,
+    "drop" : ["catnip", 15],
     "fer": 1,
     "acr" : 1
   },  
@@ -22,9 +22,16 @@ gameMonsters = {
     "moves" :["bite","claw"],
     "hp" : 8,
     "xp_given" : 1,
-    "drop" : ["potion", 60],
+    "drop" : ["potion", 30],
     "fer": 0,
     "acr" : 0
+  },
+  "mushroom": {
+    "name" : "Mad Mushroom",
+    "moves" :["shroom", "kick"],
+    "hp" : 15,
+    "xp_given" : 3,
+    "drop" : ["gold star", 5]
   },
   "angry_squirrel" : {
     "name" : "Angry Squirrel",
@@ -49,7 +56,7 @@ gameMonsters = {
     "moves" : ["nibble", "squeak"],
     "hp" : 13,
     "xp_given" : 3,
-    "drop" : ["catnip", 25],
+    "drop" : ["mouse ears", 25],
     "fer" : 2,
     "acr" : 2
   },
@@ -67,16 +74,16 @@ gameMonsters = {
     "moves" : ["swoop", "squeak"],
     "hp" : 12,
     "xp_given" : 2,
-    "drop" : False,
+    "drop" : ["batnip", 66],
     "fer" : 0,
     "acr" : 2
   },
   "bigbat": {
     "name" : "Big Bat",
     "moves" : ["swoop", "squeak", "claw"],
-    "hp" : 18,
+    "hp" : 25,
     "xp_given" : 5,
-    "drop" : False,
+    "drop" : ["bat hat", 15],
     "fer" : 1,
     "acr" : 4
   },
@@ -85,7 +92,7 @@ gameMonsters = {
     "moves" :["bunny"],
     "hp" : 9,
     "xp_given" : 2,
-    "drop" : ["bunny ears", 45],
+    "drop" : ["bunny ears", 25],
     "fer": 0,
     "acr" : 0
   },
@@ -112,7 +119,7 @@ gameMonsters = {
     "moves" :["bite","claw","kick","barf"],
     "hp" : 15,
     "xp_given" : 3,
-    "drop" : ["cat ears", 10],
+    "drop" : ["cat ears", 25],
     "fer": 0,
     "acr" : 0
   },
@@ -121,9 +128,36 @@ gameMonsters = {
     "moves" :["backrub","tailgrab"],
     "hp" : 20,
     "xp_given" : 5,
-    "drop" : False,
+    "drop" : ["gold star", 10],
     "fer": 0,
     "acr" : 0
   },
+  "vacuum" : {
+    "name" : "Vacuum Cleaner",
+    "moves" : ["vacuum_move", "vacuum_roar"],
+    "hp" : 25,
+    "xp_given" : 6,
+    "drop" : False,
+    "fer" : 2,
+    "acr" : 0
+  },
+  "dustbunny" : {
+    "name" : "Dust Bunny",
+    "moves" : ["dance", "dust"],
+    "hp" : 30,
+    "xp_given" : 6,
+    "drop" : False,
+    "fer" : 0,
+    "acr" : 2
+  },
+  "ferret" : {
+    "name" : "Ferret",
+    "moves" : ["bite", "dance"],
+    "hp" : 15,
+    "xp_given" : 6,
+    "drop" : ["ferret hat", 10],
+    "fer" : 1,
+    "acr" : 2
+  }
 }
 mlist = gameMonsters.keys()

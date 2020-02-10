@@ -29,8 +29,14 @@ moveList = {
     "pounce": move.Move(
         name="Pounce",
         verbs=['{} charges up and pounces!'],
-        dmg=[1, 16],
+        dmg=[4, 16],
         hit=2
+    ),
+    "shroom": move.Move(
+        name="Shroom Spores",
+        verbs=['{} flings spores all over!'],
+        dmg=[10,15],
+        hit=4
     ),
     "nibble": move.Move(
         name="Nibble",
@@ -50,7 +56,7 @@ moveList = {
     ),
     "barf": move.Move(
         name="Hairball",
-        verbs=['{} coughs up a hairball!'],
+        verbs=['{} coughs up a hairball!', '{} starts barfing and grosses {} out!'],
         dmg=[1, 12],
         hit=-1,
         times=2
@@ -102,5 +108,31 @@ moveList = {
         verbs=['{} rubs {}\'s fur backwards!'],
         dmg=[4, 8],
         times=2
+    ),
+    "vacuum_move": move.Move(
+      name="Slight Movement",
+      verbs=["The Vacuum makes a slight movement, startling you!", "The Vacuum is moved slightly."],
+      dmg=[8,16],
+      times=1,
+      hit=1
+    ),
+    "vacuum_roar": move.Move(
+      name="Vacuum Roar",
+      verbs=["The Vacuum roars to life!"],
+      dmg=[6,10],
+      times=3
+    ),
+    "dance": move.Move(
+      name="War Dance",
+      verbs=["{} does a war dance at {}!"],
+      dmg=[4,6],
+      times=2,
+      hit=3
+    ),
+    "dust": move.Move(
+      name="Dust Spray",
+      verbs=["{} makes {} sneeze!", "{} makes {} cough!"],
+      dmg=[7,8],
+      times=4
     )
 }
