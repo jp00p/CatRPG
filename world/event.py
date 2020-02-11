@@ -4,8 +4,9 @@ import time
 
 
 class Event:
-    def __init__(self, reqs={}, descs={}, trigger_text="", remove_self=False, on_trigger=[], e_type="", **kwargs):
+    def __init__(self, reqs={}, desc="", descs={}, trigger_text="", remove_self=False, on_trigger=[], e_type="", **kwargs):
         self.reqs = reqs
+        self.desc = desc
         self.descriptions = descs
         self.trigger_text = trigger_text
         self.remove_self = remove_self
@@ -19,6 +20,7 @@ class Event:
             getattr(player, self.reqs["stat"]),
             self.reqs["trigger"]
         ))
+        player_location = player.location
         if((getattr(player, self.reqs["stat"]) >= self.reqs["value"]) and (verb == self.reqs["trigger"])):
             print(self.trigger_text+"\n")
             time.sleep(0.4)
@@ -45,7 +47,7 @@ class Event:
                         call = getattr(player, method)
                     call(value)  # def need some error handling here
                 if(self.remove_self):
-                    worldMap[player.location].events.pop(noun)
+                    worldMap[player_location].events.pop(noun)
         elif(verb in self.descriptions.keys() and self.descriptions[verb] != ""):
             print(self.descriptions[verb])
         else:

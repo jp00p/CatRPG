@@ -215,8 +215,8 @@ class Player(Character):
         self.hat = None  # armor slot
         self.level = 1
         self.xp = 0
-        self.hp = 36
-        self.max_hp = 36
+        self.hp = 25
+        self.max_hp = 25
         self.items = items
         self.kills = {}
         self.quest_monsters = []
@@ -283,12 +283,15 @@ class Player(Character):
             return
         print("DEBUG Current items:\n{}".format(self.list_items()))
         print("DEBUG Item name to equip:{} ".format(item))
-        item = gameItems[item]
-        if(item not in self.items):
+        
+        if(item not in list(gameItems.keys())):
+            print("That's not an item!")
+        elif(item not in self.items):
             print("You don't have that item")
         elif(item.item_type != "hat"):
-            print("How would a cat equip that?")
+            print("Hmm... How would a cat equip that?")
         else:
+            item = gameItems[item]
             self.items.remove(item)
             if(self.hat != None):
                 print("You remove your {} and put it back in your inventory.".format(
@@ -412,7 +415,7 @@ class Player(Character):
         exit_dirs = {0: "North", 1: "East", 2: "South", 3: "West"}
         describe = world.worldMap[self.location].describe(
             worldMap, npcList, self)
-        print(centered("  "+COLORS.PURPLE+describe["area"]+COLORS.END+"  "))
+        print(centered("    "+COLORS.PURPLE+describe["area"]+COLORS.END+"    "))
         print_msg_box(describe["desc"], describe["title"], align="left")
         if(describe["exits"] != False):
             exits = ""
@@ -530,6 +533,19 @@ class Player(Character):
         '''
         Battle time!
         '''
+        
+        if(type(enemy) == str):
+            enemydata = gameMonsters[enemy]
+            enemy = Enemy(
+                name=enemydata["name"],
+                moves=enemydata["moves"],
+                hp=enemydata["hp"],
+                xp_given=enemydata["xp_given"],
+                drop=enemydata["drop"],
+                fer=enemydata["fer"],
+                acr=enemydata["acr"]
+            )
+        
         cls()
         victory = True
         turn = 1
@@ -745,25 +761,9 @@ class Game():
     def show_help_screen(self, prompt=False):
         cls()
         help_str = ""
-        help_str += "In this game, you are a cat.\n"
-        help_str += "Your goal is to find and befriend all 7 cats in the neighborhood.\n"
-        help_str += "Navigate by typing \"move east\" or \"go north\".  \n"
-        help_str += "You can just use the letters \"n e s w\" instead of the whole diretion.  \n"
-        help_str += "Type \"look\" to get a description of the area you're in.  \n"
-        help_str += "Type \"look tree\" to look at a tree in the area.  \n"
-        help_str += "There are some other actions to discover too:  sniff, climb, hit...   \n"
-        help_str += "Type \"hunt\" to hunt for local wildlife and raise your skills!  \n"
-        help_str += "Level up your stats to unlock more stuff!.  \n"
-        help_str += "Type \"status\" to view your status.  \n"
-        help_str += "Collect fun hats and \"equip\" them! Even though you don't have thumbs. \n"
-        help_str += "Your attitude can change as well, just like a real cat.  \n"
-        help_str += "Type \"rest\" if your HP is low or 0. You will lose XP equal to your level (but you won't lose levels).  \n"
-        help_str += "If you take too long to make friends, the cats won't trust you and you'll have to start over!\n"
-        help_str += "Making a map on paper is recommended!. There is no saving your game (yet)\n"
-        help_str += "This is the complete list of of verbs allowed in this game (some are synonyms): {}".format(
-            self.acceptable_verbs)
-        print("---- Game Help ----")
-        print(help_str)
+        help_str += "In this game, you are a cat. "
+        help_str += "This is the complete list of of verbs allowed in this game (some are synonyms):\n {}".format(", ".join(self.acceptable_verbs))
+        print_msg_box(help_str, "Game Help", align="left")
         anykey()
         if(prompt):
             self.prompt()

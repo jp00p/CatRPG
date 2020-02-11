@@ -25,7 +25,6 @@ gameItems = {
     "sweater": item.Item("Sweater", item_type="quest"),
     "cat toy": item.Item("Cat Toy", item_type="quest"),
     "mochifood": item.Item("16 Pound Bag of Food", item_type="quest"),
-
     "potion": item.Item(
         name="Potion",
         item_type="usable",
