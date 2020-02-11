@@ -326,9 +326,9 @@ class Player(Character):
         for i in set(self.items):
             numitems[i.name] = self.items.count(i)
             _items += "{} x{}, ".format(i.name, self.items.count(i))
-        #for i in list(numitems.keys):
+        # for i in list(numitems.keys):
             #_items += "{}({}), ".format(gameItems[i].name, numitems[i])
-        return _items #[:-2]
+        return _items  # [:-2]
 
     # for battle screen input
     def list_attacks(self):
@@ -378,14 +378,15 @@ class Player(Character):
         status += "    Items: {}".format(self.list_items())
         print_msg_box(status, title, align="none")
         #print("DEBUG:Quest Items:{}\nQuest Monsters:{}\nQuest Kills:{}\n".format(self.quest_items, self.quest_monsters, self.kills))
-    def add_stat(self,give=["cur",0]):
-        if(give[0]=="cur"):
+
+    def add_stat(self, give=["cur", 0]):
+        if(give[0] == "cur"):
             self.curiosity += give[1]
-        if(give[0]=="acr"):
+        if(give[0] == "acr"):
             self.acrobatics += give[1]
-        if(give[0]=="fer"):
+        if(give[0] == "fer"):
             self.ferocity += give[1]
-        
+
     def try_move(self, curRoom, direction):
         # dirs = { 0:"North", 1:"East", 2:"South", 3:"West" }
         if(curRoom.exits[direction] != False):
@@ -686,7 +687,7 @@ class Game():
                     self.player.try_move(
                         world.worldMap[self.player.location], direction)
                 if(verb in ["look", "inspect", "examine", "lay", "lie", "sniff", "smell", "climb", "take", "get", "grab", "hit", "paw", "push"]):
-                    if(verb in ["hit", "push"]):
+                    if(verb in ["hit", "push", "paw"]):
                         verb = "hit"
                     if(verb in ["sniff", "smell"]):
                         verb = "sniff"
@@ -787,8 +788,8 @@ class Game():
         cls()
         Screen.wrapper(self.title_screen_graphics)
         self.title_screen_select()
-        
-    def intro_screen(self,screen):
+
+    def intro_screen(self, screen):
         scenes = []
         effects = [
             Scroll(screen, 3),
@@ -806,7 +807,8 @@ class Game():
         scenes.append(Scene(effects, (screen.height + 104) * 3))
         effects = [
             Scroll(screen, 3),
-            Print(screen, SpeechBubble("Press X to continue"), screen.height+12, Screen.COLOUR_CYAN)
+            Print(screen, SpeechBubble("Press X to continue"),
+                  screen.height+12, Screen.COLOUR_CYAN)
         ]
         scenes.append(Scene(effects, 300, clear=True))
         screen.play(scenes, stop_on_resize=True, )
@@ -816,10 +818,11 @@ class Game():
         action = str(input("?> "))
         action = action.lower()
         if(action in self.title_choices):
-            if action == "play":              
-                #Screen.wrapper(self.intro_screen)
+            if action == "play":
+                # Screen.wrapper(self.intro_screen)
                 cls()
-                print_msg_box("Lorem ipsum intro text can go here.", "Title Goes here", align="center")
+                print_msg_box("Lorem ipsum intro text can go here.",
+                              "Title Goes here", align="center")
                 anykey()
                 cls()
                 self.character_creation()
