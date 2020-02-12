@@ -45,6 +45,7 @@ class Event:
                     if(obj == "player"):
                         # call = function of player
                         call = getattr(player, method)
+                    time.sleep(2)
                     call(value)  # def need some error handling here
                 if(self.remove_self):
                     worldMap[player_location].events.pop(noun)

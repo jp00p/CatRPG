@@ -466,18 +466,21 @@ class Player(Character):
             encounter = ["You spot a {}!",
                          "You encounter a {}!", "You come upon a {}!"]
             speak(choice(encounter).format(enemy.name))
-            time.sleep(1)
+            anykey()
             if(self.battle(enemy)):
+                cls()
                 victory = ["Victory!", "You are the ultimate hunter!",
                            "You have emerged victorious!", "You are master of the hunt!", "Your prey runs away scared!"]
                 speak(choice(victory))
                 anykey()
             else:
-                speak("You are too tired for hunting now. You need to rest or heal.")
-                time.sleep(2)
+                cls()
+                speak("You run away embarassed! You should rest.")
+                anykey()
             del enemy
         else:
             print("There doesn't seem to be anything to hunt around here.")
+            anykey()
             time.sleep(1)
 
     def use_item(self, item):

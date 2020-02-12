@@ -22,13 +22,18 @@ class AREA_DIFFICULTY:
     HOUSE = 9
     BYARD = 11
     ALLEY = 15
+    
+    
+# Faucet
+# Dog
+# Hair Tie
+# Cat tower
+# possum
+# blanket monster (hand under a blanket)
+# boxes
+# bushes
+# spiders
 
-
-###
-# Maybe set up default stat numbers per area (so each area has a different "difficulty")
-# e.g.  BACKYARD = 8
-#       FYARD = 6
-###
 
 
 # some common events
@@ -58,9 +63,9 @@ worldMap = {
 
     "start1": room.Room(
         room_id="start1",
-        name="Hunting Patch",
+        name="Wooded Path",
         area="Outskirts",
-        description="Seems to be a popular spot for local cats to hunt.  A tall fence blocks your passage to the south.",
+        description="A small trail in the woods. ",
         exits=[False, "start2", False, False],
         enemies=["bird", "mouse", "squirrel"],
         random_battle=True,
@@ -88,13 +93,13 @@ worldMap = {
         room_id="start2",
         name="Sidewalk",
         area="Outskirts",
-        description="A grassy sidewalk next to the road.  A tall fence blocks your path to the south.",
+        description="A grassy sidewalk next to the road.",
         exits=[False, "start3", False, "start1"],
         enemies=["bird", "mouse"],
         random_battle=True,
         events={
             "road": event.Event(
-                desc="There's a road to the north that you could cross if you look both ways.",
+                desc="There's a road to the north that you could cross if you look carefully.",
                 reqs={
                     "stat": "acrobatics",
                     "value": AREA_DIFFICULTY.START,
@@ -107,6 +112,22 @@ worldMap = {
                 remove_self=True,
                 on_trigger=[["room", "set_exits", ["driveway", False, "start3", "start1"]], ["player", "enter", "driveway"]],
                 e_type="text"
+            ),
+            "grass" : event.Event(
+                desc="You see a slightly suspicious patch of grass.",
+                reqs={
+                    "stat" : "curiosity",
+                    "value" : AREA_DIFFICULTY.START,
+                    "trigger" : "sniff"
+                },
+                descs={
+                    "sniff":"Smells like something... you can't quite make it out yet",
+                    "look":"Looks like a discolored patch of grass",
+                    "hit":"You paw the grass and disturb the grasshoppers, but nothing happens",
+                },
+                trigger_text="You sniff the patch of grass and realize another cat peed here! You make a stinky face",
+                remove_self=True,
+                on_trigger=[["player", "apply_item", "stinkyface"]]
             )
         }
     ),
@@ -137,14 +158,14 @@ worldMap = {
                 e_type="text"
             ),
             "tree": event.Event(
-                desc="There's a tree here that catches your eye.",
+                desc="A tree here has a scent that catches your nose.",
                 reqs={
                     "stat": "acrobatics",
                     "value": AREA_DIFFICULTY.START,
                     "trigger": "climb"
                 },
-                descs={"sniff": "Something smells funny up one of these trees.",
-                       "look": "You see something up top one of the trees.",
+                descs={"sniff": "Something smells funny up in the tree's branches.",
+                       "look": "You see something up top the tree.",
                        "hit": "You test your claws against the tree! Nothing happens.",
                        "climb": "You can't seem to climb high enough, yet."},
                 trigger_text="You scramble up the tree and find a stash of ...batnip!?",
@@ -185,10 +206,9 @@ worldMap = {
                 },
                 trigger_text="It begins!",
                 remove_self=True,
-                on_trigger=[["player", "battle", "mouse"]]
+                on_trigger=[["player", "battle", "vacuum"]]
             )
         }
-
     ),
     "start5": room.Room(
         room_id="start5",
@@ -216,6 +236,24 @@ worldMap = {
                 remove_self=True,
                 on_trigger=[
                     ["player", "give_items", ["catnip", "potion", "potion"]]
+                ]
+            ),
+            "hole" : event.Event(
+                desc="You can see a small hole in the grass.",
+                reqs={
+                    "stat" : "curiosity",
+                    "value" : AREA_DIFFICULTY.START,
+                    "trigger" : "look"
+                },
+                descs={
+                    "look" : "You give the hole a cursory glance but don't feel like inspecting futher yet",
+                    "sniff" : "The hole smells a little scaly",
+                    "hit" : "You paw the grass around the hole to no effect",
+                },
+                trigger_text="As you look deeper into the hole, a snake pops out!",
+                remove_self=False,
+                on_trigger=[
+                    ["player", "battle", "snake"]
                 ]
             )
         }
@@ -385,7 +423,7 @@ worldMap = {
         room_id="roof1",
         area="Rooftop",
         name="Back of Roof",
-        description="Way up here, you can see over the entire back half of the neighborhood.  There is a tree reaching up from the backyard.",
+        description="Way up here, you can see over the entire back half of the neighborhood. ",
         exits=[False, False, "roof2", False],
         random_battle=False,
         npc="mika",
@@ -586,6 +624,9 @@ worldMap = {
         description="Backyard 8",
         exits=["byard4", False, "driveway", "byard7"]
     ),
+    
+    "basement1": room.Room(),
+    "basement2": room.Room(),
 
     "alley1": room.Room(),
     "alley2": room.Room(),

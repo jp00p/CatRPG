@@ -104,7 +104,7 @@ gameMonsters = {
     "hp" : 15,
     "xp_given" : 3,
     "drop" : ["snake hat", 25],
-    "fer": 0,
+    "fer": 2,
     "acr" : 4
   },
   "fish" : {
@@ -122,7 +122,7 @@ gameMonsters = {
     "hp" : 15,
     "xp_given" : 3,
     "drop" : ["cat ears", 25],
-    "fer": 2,
+    "fer": 3,
     "acr" : 2
   },
   "child" : {
@@ -131,7 +131,7 @@ gameMonsters = {
     "hp" : 25,
     "xp_given" : 5,
     "drop" : ["gold star", 10],
-    "fer": 2,
+    "fer": 4,
     "acr" : 0
   },
   "vacuum" : {
@@ -140,8 +140,17 @@ gameMonsters = {
     "hp" : 35,
     "xp_given" : 6,
     "drop" : False,
-    "fer" : 2,
+    "fer" : 6,
     "acr" : 0
+  },
+  "blanket" : {
+    "name" : "Hand Under a Blanket",
+    "moves" : [],
+    "hp" : 30,
+    "xp_given" : 5,
+    "drop" : False,
+    "fer" : 5,
+    "acr" : 2
   },
   "dustbunny" : {
     "name" : "Dust Bunny",
