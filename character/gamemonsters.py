@@ -144,8 +144,8 @@ gameMonsters = {
     "acr" : 0
   },
   "blanket" : {
-    "name" : "Hand Under a Blanket",
-    "moves" : [],
+    "name" : "Weird Unknown Shape Under a Blanket",
+    "moves" : ["blanket1"],
     "hp" : 30,
     "xp_given" : 5,
     "drop" : False,

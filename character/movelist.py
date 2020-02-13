@@ -111,9 +111,8 @@ moveList = {
     ),
     "vacuum_move": move.Move(
       name="Slight Movement",
-      verbs=["The Vacuum makes a slight movement, startling you!", "The Vacuum is moved slightly."],
+      verbs=["The {}} makes a slight movement, startling you!", "The {} is moved slightly."],
       dmg=[8,16],
-      times=1,
       hit=1
     ),
     "vacuum_roar": move.Move(
@@ -124,15 +123,20 @@ moveList = {
     ),
     "dance": move.Move(
       name="War Dance",
-      verbs=["{} does a war dance at {}!"],
-      dmg=[4,6],
-      times=2,
-      hit=3
+      verbs=["{} does a weasel war dance at {}!", "{} does a weird dance and makes strange sounds!"],
+      dmg=[6,12],
+      hit=2
     ),
     "dust": move.Move(
       name="Dust Spray",
       verbs=["{} makes {} sneeze!", "{} makes {} cough!"],
       dmg=[7,8],
       times=4
-    )
+    ),
+    "blanket1": move.Move(
+      name="Hand Moving under the Blanket",
+      verbs=["{} is not moving, which scares you!", "{} moves with suddeness, scaring you!"],
+      dmg=[0,10],
+      hit=10
+    )    
 }

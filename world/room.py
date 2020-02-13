@@ -84,15 +84,17 @@ class Room:
             player.give_quest(npc.quest_type, npc.required[0])
             npc.set_state(1)  # quest accepted
         elif(npc.state == 1):
-            print(npc.states[1])  # quest in progress
             if(npc.quest_type == "monster" and player.kills[npc.required[0]] >= npc.required[1]):
-                print("You killed enough!")
+                print("DEBUG: You killed enough!")
                 player.remove_quest(npc.quest_type, npc.required[0])
                 npc.set_state(2)
             elif(npc.quest_type == "item" and gameItems[npc.required[0]] in player.items):
-                print("You have enough items!")
+                print("DEBUG: You have enough items for this quest!")
                 player.remove_quest(npc.quest_type, npc.required[0])
                 player.remove_items([gameItems[npc.required[0]]])
+                print(npc.thanks)
                 npc.set_state(2)
+            else:
+                print(npc.states[1])  # quest in progress
         elif(npc.state == 2):
             print(npc.states[2])  # quest complete

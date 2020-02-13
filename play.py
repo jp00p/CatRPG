@@ -638,14 +638,14 @@ class Game():
             self.start_game()
 
     def prompt(self):
-        if(self.turn == 999):
+        if(self.turn == 500):
             self.game_over()
             return
-        print(" {:2d}                           ".format(self.turn))
-        print("┍━━━━━━━━━━━━━━✿━━━━━━━━━━━━━━━┑")
-        print("  What would you like to do?")
-        print("  (move, look, status, help...)")
-        print("┕━━━━━━━━━━━━━━✿━━━━━━━━━━━━━━━┙")
+        print(" Turn: {:2d}/500                           ".format(self.turn))
+        print("┍━━━━━━━━━━━━━━━✿━━━━━━━━━━━━━━━━┑")
+        print("  What would you like to do meow?")
+        print("  (move, look, status, hunt, help...)")
+        print("┕━━━━━━━━━━━━━━━✿━━━━━━━━━━━━━━━━┙")
         action = input("?> ") or ""
         self.parse_input(action.lower())
         self.prompt()  # loopback
@@ -684,8 +684,8 @@ class Game():
             elif (verb in self.acceptable_verbs):
                 # handle specific verbs
                 cls()
-                self.turn += 1
                 if(verb in ["rest", "sleep"]):
+                    self.turn += 1
                     self.player.rest()
                     pass
                 if(verb == "help"):
@@ -693,6 +693,9 @@ class Game():
                     pass
                 if(verb in ["move", "go"] and noun == ""):
                     print("Try typing 'move north' or 'go east'")
+                    pass
+                if(verb in ["move", "go"] and noun not in (self.up_dir,self.right_dir,self.down_dir,self.left_dir)):
+                    print("Invalid direction")
                     pass
                 if(verb in ["move", "go"] and noun != ""):
                     if noun.lower() in self.up_dir:
@@ -703,8 +706,10 @@ class Game():
                         direction = 2
                     elif noun.lower() in self.left_dir:
                         direction = 3
+                    self.turn += 1
                     self.player.try_move(
                         world.worldMap[self.player.location], direction)
+                    pass
                 if(verb in ["look", "inspect", "examine", "lay", "lie", "sniff", "smell", "climb", "take", "get", "grab", "hit", "paw", "push"]):
                     if(verb in ["hit", "push", "paw"]):
                         verb = "hit"
@@ -727,6 +732,7 @@ class Game():
                             "There isn't anything like that around here.")
                         pass
                     elif(noun in room_events and noun != ""):
+                        self.turn += 1
                         world.worldMap[self.player.location].events[noun].fire(
                             noun, verb, self.player, world.worldMap)
                         pass
@@ -735,6 +741,7 @@ class Game():
                     self.player.equip(noun)
                     pass
                 if(verb == "hunt"):
+                    self.turn += 1
                     self.player.hunt(world.worldMap[self.player.location])
                     self.player.look(world.worldMap[self.player.location])
                     pass
@@ -742,6 +749,7 @@ class Game():
                     self.player.show_status()
                     pass
                 if(verb == "use"):
+                    self.turn += 1
                     self.player.use_item(noun)
                     pass
                 if(verb in ["talk", "speak"]):
@@ -763,10 +771,15 @@ class Game():
 
     def show_help_screen(self, prompt=False):
         cls()
-        help_str = ""
-        help_str += "In this game, you are a cat. "
-        help_str += "This is the complete list of of verbs allowed in this game (some are synonyms):\n {}".format(", ".join(self.acceptable_verbs))
-        print_msg_box(help_str, "Game Help", align="left")
+        help_lines=[
+            "This is the complete list of actions allowed in this game (some are synonyms): {}".format(", ".join(self.acceptable_verbs)),
+            "Tips & Tricks",
+            "1. Try hunting to increase your stats!",
+            "2. Hats and Attitudes will change your stats (not always good) and sometimes give you new moves.",
+            "3. "
+        ]
+        for line in help_lines:
+            print(text_wrapper.wrap(line)+"\n")
         anykey()
         if(prompt):
             self.prompt()

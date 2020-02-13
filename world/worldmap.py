@@ -495,15 +495,60 @@ worldMap = {
         room_id="house2",
         name="Bedroom",
         area="House (Inside)",
-        description="Big bed",
-        exits=[False, False, "house4", "house1"]
+        description="This is a cozy room, perfect for when you need a nap.",
+        events={
+          "bed": event.Event(
+              desc="There's a big tall comfy bed in here.",
+              reqs={
+                  "stat":"acrobatics",
+                  "value":AREA_DIFFICULTY.HOUSE,
+                  "trigger":"climb"
+              },
+              descs={
+                  "look":"The bed is too tall to see on top of!",
+                  "sniff":"You smell something on top of the bed.",
+                  "take":"The bed is too big to take!",
+                  "climb":"You clumsily fall off the side of the bed! You're not very acrobatic."
+              },
+              trigger_text="You climb up on the bed and find a portable cat scratcher!",
+              remove_self=True,
+              on_trigger=[["player", "give_items", ["scratcher"]]]
+          )  
+        },
+        exits=[False, False, "house4", "house1"],
+        random_battle=True,
+        enemies=["ferret", "blanket"]
     ),
     "house3": room.Room(
         room_id="house3",
         name="Living Room",
         area="House (Inside)",
-        description="Cat tower kingdom",
-        exits=["house1", "house4", "porch", False]
+        description="This room is a forest of cat towers!",
+        events={
+          "cave": event.Event(
+              desc="One of the towers has a cave, something inside is glinting in the light.",
+          ),
+          "tower": event.Event(
+              desc="There's something on top of a tower you can smell, and it smells good!",
+              reqs={
+                  "stat":"acrobatics",
+                  "value":AREA_DIFFICULTY.HOUSE,
+                  "trigger":"climb"
+              },
+              descs={
+                  "look":"You will need to climb up there to see it.",
+                  "sniff":"Whatever's up there smells delicious.",
+                  "hit":"You bat at the tower and it doesn't budge.",
+                  "climb":"You aren't acrobatic enough to climb that high!"
+              },
+              trigger_text="You get to the top of the tallest tower and find a packet of Gogurt! You aren't sure how to open it so you save it for later.",
+              remove_self=True,
+              on_trigger=[["player", "give_items", ["gogurt"]]]
+          )
+        },
+        exits=["house1", "house4", "porch", False],
+        random_battle=True,
+        enemies=["ferret", "vacuum", "dustbunny"]
     ),
     "house4": room.Room(
         room_id="house4",
@@ -548,7 +593,7 @@ worldMap = {
         random_battle=True,
         events={
             "pond": event.Event(
-                desc="There's a large pond here",
+                desc="There's a large pond here. ",
                 reqs={
                     "stat": "curiosity",
                     "value": AREA_DIFFICULTY.NYARD,
