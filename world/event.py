@@ -25,7 +25,6 @@ class Event:
             print(self.trigger_text+"\n")
             time.sleep(0.4)
             print("\n")
-            time.sleep(0.2)
             if(self.on_trigger):
                 for i in self.on_trigger:
                     trigger = i
@@ -45,7 +44,6 @@ class Event:
                     if(obj == "player"):
                         # call = function of player
                         call = getattr(player, method)
-                    time.sleep(2)
                     call(value)  # def need some error handling here
                 if(self.remove_self):
                     worldMap[player_location].events.pop(noun)

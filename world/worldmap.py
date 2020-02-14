@@ -22,8 +22,8 @@ class AREA_DIFFICULTY:
     HOUSE = 9
     BYARD = 11
     ALLEY = 15
-    
-    
+
+
 # Faucet
 # Dog
 # Hair Tie
@@ -33,23 +33,6 @@ class AREA_DIFFICULTY:
 # boxes
 # bushes
 # spiders
-
-
-
-# some common events
-potion = event.Event(
-    reqs={
-        "stat": "acrobatics",  # doesnt matter which stat
-        "value": 0,  # free thing
-        "trigger": "take"
-    },
-    descs={"look": "Looks like a potion?",
-           "sniff": "Smells healthy!",
-           "hit": "That's not how you take things!"},
-    trigger_text="You take the potion.",
-    remove_self=True,
-    on_trigger=[["player", "give_items", ["potion"]]]
-)
 
 
 worldMap = {
@@ -110,20 +93,21 @@ worldMap = {
                        "look": "The first step is looking both ways, but you're not fast enough to dash across yet."},
                 trigger_text="You naughtily dash across the street! Luckily there's no cars allowed on this street.",
                 remove_self=True,
-                on_trigger=[["room", "set_exits", ["driveway", False, "start3", "start1"]], ["player", "enter", "driveway"]],
+                on_trigger=[["room", "set_exits", ["driveway", False, "start3", "start1"]], [
+                    "player", "enter", "driveway"]],
                 e_type="text"
             ),
-            "grass" : event.Event(
+            "grass": event.Event(
                 desc="You see a slightly suspicious patch of grass.",
                 reqs={
-                    "stat" : "curiosity",
-                    "value" : AREA_DIFFICULTY.START,
-                    "trigger" : "sniff"
+                    "stat": "curiosity",
+                    "value": AREA_DIFFICULTY.START,
+                    "trigger": "sniff"
                 },
                 descs={
-                    "sniff":"Smells like something... you can't quite make it out yet",
-                    "look":"Looks like a discolored patch of grass",
-                    "hit":"You paw the grass and disturb the grasshoppers, but nothing happens",
+                    "sniff": "Smells like something... you can't quite make it out yet",
+                    "look": "Looks like a discolored patch of grass",
+                    "hit": "You paw the grass and disturb the grasshoppers, but nothing happens",
                 },
                 trigger_text="You sniff the patch of grass and realize another cat peed here! You make a stinky face",
                 remove_self=True,
@@ -152,7 +136,7 @@ worldMap = {
                 trigger_text="The trail smells like treats!  You follow your nose and find a way through the trail to the north!",
                 remove_self=True,
                 on_trigger=[
-                    ["room", "set_exits", ["nyard1", False, "start6", "start2"]], 
+                    ["room", "set_exits", ["nyard1", False, "start6", "start2"]],
                     ["room", "set_state", 1],
                     ["room", "set_exits", [False, "nyard2", "start3", "driveway"], "nyard1"]],
                 e_type="text"
@@ -196,17 +180,6 @@ worldMap = {
                 trigger_text="You smell the scents of home, making you feel nostalgic.",
                 remove_self=False,
                 on_trigger=[["player", "apply_item", "nostalgic"]]
-            ),
-            "test": event.Event(
-                desc="There's something to test here",
-                reqs={
-                    "stat":"curiosity",
-                    "value":0,
-                    "trigger":"look"
-                },
-                trigger_text="It begins!",
-                remove_self=True,
-                on_trigger=[["player", "battle", "vacuum"]]
             )
         }
     ),
@@ -222,15 +195,15 @@ worldMap = {
             "bag": event.Event(
                 desc="There's a bag laying in the middle of the field.",
                 reqs={
-                    "stat" : "ferocity",
-                    "value" : AREA_DIFFICULTY.START,
-                    "trigger" : "hit"
+                    "stat": "ferocity",
+                    "value": AREA_DIFFICULTY.START,
+                    "trigger": "hit"
                 },
                 descs={
-                    "look" : "You see a plastic bag flapping in the wind.  It seems to be full of something",
-                    "sniff" : "The bag smells like something familiar!",
-                    "hit" : "You feebly paw at the bag but you aren't strong enough to flip it over",
-                    "take" : "You can't take the bag!"
+                    "look": "You see a plastic bag flapping in the wind.  It seems to be full of something",
+                    "sniff": "The bag smells like something familiar!",
+                    "hit": "You feebly paw at the bag but you aren't strong enough to flip it over",
+                    "take": "You can't take the bag!"
                 },
                 trigger_text="You viciously paw the bag open, revealing some goodies!",
                 remove_self=True,
@@ -238,17 +211,18 @@ worldMap = {
                     ["player", "give_items", ["catnip", "potion", "potion"]]
                 ]
             ),
-            "hole" : event.Event(
+            "hole": event.Event(
                 desc="You can see a small hole in the grass.",
                 reqs={
-                    "stat" : "curiosity",
-                    "value" : AREA_DIFFICULTY.START,
-                    "trigger" : "look"
+                    "stat": "curiosity",
+                    "value": AREA_DIFFICULTY.START,
+                    "trigger": "look"
                 },
                 descs={
-                    "look" : "You give the hole a cursory glance but don't feel like inspecting futher yet",
-                    "sniff" : "The hole smells a little scaly",
-                    "hit" : "You paw the grass around the hole to no effect",
+                    "look": "You give the hole a cursory glance but you don't feel curious enough to inspect futher.",
+                    "sniff": "The hole smells a little scaly",
+                    "hit": "You paw the grass around the hole to no effect",
+                    "climb": "The hole is too small to climb into."
                 },
                 trigger_text="As you look deeper into the hole, a snake pops out!",
                 remove_self=False,
@@ -276,8 +250,8 @@ worldMap = {
                 },
                 descs={"look": "It's too hard for you to balance on the edge to look inside! You're not acrobatic enough!",
                        "sniff": "Smells like garbage! And fish...",
-                       "hit" : "You paw makes a hollow clang against the dumpster",
-                       "take" : "You put the dumpster in your pocket.  Just kidding!"},
+                       "hit": "You paw makes a hollow clang against the dumpster",
+                       "take": "You put the dumpster in your pocket.  Just kidding!"},
                 trigger_text="You balance on the edge and look inside... you find a tuna fish!",
                 remove_self=True,
                 on_trigger=[["player", "give_items", ["tuna"]]]
@@ -497,23 +471,23 @@ worldMap = {
         area="House (Inside)",
         description="This is a cozy room, perfect for when you need a nap.",
         events={
-          "bed": event.Event(
-              desc="There's a big tall comfy bed in here.",
-              reqs={
-                  "stat":"acrobatics",
-                  "value":AREA_DIFFICULTY.HOUSE,
-                  "trigger":"climb"
-              },
-              descs={
-                  "look":"The bed is too tall to see on top of!",
-                  "sniff":"You smell something on top of the bed.",
-                  "take":"The bed is too big to take!",
-                  "climb":"You clumsily fall off the side of the bed! You're not very acrobatic."
-              },
-              trigger_text="You climb up on the bed and find a portable cat scratcher!",
-              remove_self=True,
-              on_trigger=[["player", "give_items", ["scratcher"]]]
-          )  
+            "bed": event.Event(
+                desc="There's a big tall comfy bed in here.",
+                reqs={
+                    "stat": "acrobatics",
+                    "value": AREA_DIFFICULTY.HOUSE,
+                    "trigger": "climb"
+                },
+                descs={
+                    "look": "The bed is too tall to see on top of!",
+                    "sniff": "You smell something on top of the bed.",
+                    "take": "The bed is too big to take!",
+                    "climb": "You clumsily fall off the side of the bed! You're not very acrobatic."
+                },
+                trigger_text="You climb up on the bed and find a portable cat scratcher!",
+                remove_self=True,
+                on_trigger=[["player", "give_items", ["scratcher"]]]
+            )
         },
         exits=[False, False, "house4", "house1"],
         random_battle=True,
@@ -525,26 +499,26 @@ worldMap = {
         area="House (Inside)",
         description="This room is a forest of cat towers!",
         events={
-          "cave": event.Event(
-              desc="One of the towers has a cave, something inside is glinting in the light.",
-          ),
-          "tower": event.Event(
-              desc="There's something on top of a tower you can smell, and it smells good!",
-              reqs={
-                  "stat":"acrobatics",
-                  "value":AREA_DIFFICULTY.HOUSE,
-                  "trigger":"climb"
-              },
-              descs={
-                  "look":"You will need to climb up there to see it.",
-                  "sniff":"Whatever's up there smells delicious.",
-                  "hit":"You bat at the tower and it doesn't budge.",
-                  "climb":"You aren't acrobatic enough to climb that high!"
-              },
-              trigger_text="You get to the top of the tallest tower and find a packet of Gogurt! You aren't sure how to open it so you save it for later.",
-              remove_self=True,
-              on_trigger=[["player", "give_items", ["gogurt"]]]
-          )
+            "cave": event.Event(
+                desc="One of the towers has a cave, something inside is glinting in the light.",
+            ),
+            "tower": event.Event(
+                desc="There's something on top of a tower you can smell, and it smells good!",
+                reqs={
+                    "stat": "acrobatics",
+                    "value": AREA_DIFFICULTY.HOUSE,
+                    "trigger": "climb"
+                },
+                descs={
+                    "look": "You will need to climb up there to see it.",
+                    "sniff": "Whatever's up there smells delicious.",
+                    "hit": "You bat at the tower and it doesn't budge.",
+                    "climb": "You aren't acrobatic enough to climb that high!"
+                },
+                trigger_text="You get to the top of the tallest tower and find a packet of Gogurt! You aren't sure how to open it so you save it for later.",
+                remove_self=True,
+                on_trigger=[["player", "give_items", ["gogurt"]]]
+            )
         },
         exits=["house1", "house4", "porch", False],
         random_battle=True,
@@ -573,7 +547,7 @@ worldMap = {
                 descs={"look": "You can see something hanging from a vine.",
                        "sniff": "The vines smell like bats!",
                        "hit": "You try to hit the vine but you can't jump high enough yet.",
-                       "climb":"The vine won't support your weight"},
+                       "climb": "The vine won't support your weight"},
                 trigger_text="You do a super jump and knock a hat out of the tree!",
                 remove_self=True,
                 on_trigger=[["player", "give_items", ["bat hat"]]]
@@ -669,7 +643,7 @@ worldMap = {
         description="Backyard 8",
         exits=["byard4", False, "driveway", "byard7"]
     ),
-    
+
     "basement1": room.Room(),
     "basement2": room.Room(),
 

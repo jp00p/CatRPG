@@ -61,17 +61,18 @@ class Room:
         if(self.state != 0 and self.states):
             area_desc = self.states[self.state]
         if(self.npc != ""):
-            area_desc += "\n\n"+COLORS.BOLD+npcList[self.npc].desc+COLORS.END+"\n"
+            area_desc += "\n\n"+COLORS.BOLD + \
+                npcList[self.npc].desc+COLORS.END+"\n"
         # if(player.curiosity >= 6):
         #     for i in self.get_event_list():
         #         # i == tree, eg
         #         keyword = "{}{}{}".format(COLORS.BOLD, i, COLORS.END)
         #         area_desc = area_desc.replace(i, keyword)
-        #print(area_desc)  # , title=self.name)
+        # print(area_desc)  # , title=self.name)
         #exits = self.show_exits(worldMap)
-        #print("\nExits:\n{}".format(exits))
-        #time.sleep(0.33)
-        return { "desc": area_desc, "title":self.name, "exits": self.exits, "npc": self.npc, "area":self.area, "room_id" : self.id }
+        # print("\nExits:\n{}".format(exits))
+        # time.sleep(0.33)
+        return {"desc": area_desc, "title": self.name, "exits": self.exits, "npc": self.npc, "area": self.area, "room_id": self.id}
 
     def set_state(self, state):
         self.state = state

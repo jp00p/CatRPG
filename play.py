@@ -117,7 +117,6 @@ def print_msg_box(content, title="", align="center", ret=False, width=screen_wid
             cc = joinchar.join(line.center(width-2) for line in lines)
         elif(align == "left"):
             cc = joinchar.join(textwrap.indent(line, "    ") for line in lines)
-
         elif(align == "none"):
             cc = content
 
@@ -250,7 +249,7 @@ class Player(Character):
 
     def remove_quest(self, quest_type, quest_thing):
         if(quest_type == "monster"):
-            print("removing monster: {}".format(quest_thing))
+            print("DEBUG removing monster: {}".format(quest_thing))
             self.quest_monsters.remove(quest_thing)
         else:
             self.quest_items.remove(quest_thing)
@@ -283,7 +282,7 @@ class Player(Character):
             return
         print("DEBUG Current items:\n{}".format(self.list_items()))
         print("DEBUG Item name to equip:{} ".format(item))
-        
+
         if(item not in list(gameItems.keys())):
             print("That's not an item!")
         elif(item not in self.items):
@@ -415,7 +414,7 @@ class Player(Character):
         exit_dirs = {0: "North", 1: "East", 2: "South", 3: "West"}
         describe = world.worldMap[self.location].describe(
             worldMap, npcList, self)
-        print(centered("    "+COLORS.PURPLE+describe["area"]+COLORS.END+"    "))
+        centered("    "+COLORS.PURPLE + describe["area"]+COLORS.END)
         print_msg_box(describe["desc"], describe["title"], align="left")
         if(describe["exits"] != False):
             exits = ""
@@ -536,7 +535,7 @@ class Player(Character):
         '''
         Battle time!
         '''
-        
+
         if(type(enemy) == str):
             enemydata = gameMonsters[enemy]
             enemy = Enemy(
@@ -548,7 +547,7 @@ class Player(Character):
                 fer=enemydata["fer"],
                 acr=enemydata["acr"]
             )
-        
+
         cls()
         victory = True
         turn = 1
@@ -694,7 +693,7 @@ class Game():
                 if(verb in ["move", "go"] and noun == ""):
                     print("Try typing 'move north' or 'go east'")
                     pass
-                if(verb in ["move", "go"] and noun not in (self.up_dir,self.right_dir,self.down_dir,self.left_dir)):
+                if(verb in ["move", "go"] and noun not in (self.up_dir, self.right_dir, self.down_dir, self.left_dir)):
                     print("Invalid direction")
                     pass
                 if(verb in ["move", "go"] and noun != ""):
@@ -771,15 +770,17 @@ class Game():
 
     def show_help_screen(self, prompt=False):
         cls()
-        help_lines=[
-            "This is the complete list of actions allowed in this game (some are synonyms): {}".format(", ".join(self.acceptable_verbs)),
+        help_lines = [
+            "This is the complete list of actions allowed in this game (some are synonyms): {}".format(
+                ", ".join(self.acceptable_verbs)),
             "Tips & Tricks",
             "1. Try hunting to increase your stats!",
             "2. Hats and Attitudes will change your stats (not always good) and sometimes give you new moves.",
-            "3. "
+            "3. Each area has a different difficulty. Backtrack if you're not strong enough!",
+            #"4. "
         ]
         for line in help_lines:
-            print(text_wrapper.wrap(line)+"\n")
+            print(text_wrapper.wrap(line))
         anykey()
         if(prompt):
             self.prompt()
