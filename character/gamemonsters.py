@@ -31,7 +31,7 @@ gameMonsters = {
         "moves": ["shroom", "kick"],
         "hp": 25,
         "xp_given": 3,
-        "drop": ["gold star", 5],
+        "drop": ["gold star", 15],
         "fer": 3,
         "acr": 3
     },
@@ -40,7 +40,7 @@ gameMonsters = {
         "moves": ["bite", "claw", "pounce"],
         "hp": 30,
         "xp_given": 2,
-        "drop": False,
+        "drop": ["scratcher", 15],
         "fer": 4,
         "acr": 2
     },
@@ -49,13 +49,13 @@ gameMonsters = {
         "moves": ["nibble", "squeak"],
         "hp": 10,
         "xp_given": 1,
-        "drop": False,
+        "drop": ["mouse ears", 15],
         "fer": 0,
         "acr": 2
     },
     "housemouse": {
         "name": "House Mouse",
-        "moves": ["nibble", "squeak"],
+        "moves": ["nibble", "squeak", "bite"],
         "hp": 20,
         "xp_given": 3,
         "drop": ["mouse ears", 25],
@@ -76,7 +76,7 @@ gameMonsters = {
         "moves": ["swoop", "squeak"],
         "hp": 17,
         "xp_given": 2,
-        "drop": ["batnip", 66],
+        "drop": ["batnip", 50],
         "fer": 0,
         "acr": 2
     },
@@ -97,6 +97,17 @@ gameMonsters = {
         "drop": ["bunny ears", 25],
         "fer": 1,
         "acr": 2
+    },
+    "snail" : {
+      "name" : "Snail",
+      "moves" : ["slime", "slurp", "slither"],
+      "hp" : 25,
+      "xp_given" : 4,
+      "drop" : ["snail hat", 15],
+    },
+    "frog" : {
+        "name" : "Frog",
+        "moves" : ["slurp", "slime", ]
     },
     "snake": {
         "name": "Snake",

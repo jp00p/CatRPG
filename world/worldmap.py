@@ -297,14 +297,17 @@ worldMap = {
                 desc="There's a big soft bed, just for cats, laying in the middle of a sunbeam.",
                 reqs={
                     "stat": "acrobatics",
-                    "value": 0,  # trap!
+                    "value": -20,  # trap!
                     "trigger": "lay"
                 },
                 descs={"look": "Looks like a warm and cozy spot to lay down.",
-                       "sniff": "Smells like a bunch of other cats.  Probably safe to lay upon."},
+                       "sniff": "Smells like a bunch of other cats. Probably safe to lay upon."},
                 trigger_text="You get cozy on the bed and curl up.  It makes you sleepy!  Too sleepy.",
                 remove_self=False,
-                on_trigger=[["player", "apply_item", "sleepy"]]
+                on_trigger=[
+                    ["player", "apply_item", "sleepy"],
+                    ["player", "give_hp", 15]
+                    ]
             )
         }
     ),
@@ -383,7 +386,7 @@ worldMap = {
                 desc="There's tree branches you can climb down on.",
                 reqs={
                     "stat": "acrobatics",
-                    "value": 0,  # dont trap them on the roof
+                    "value": -100,  # dont trap them on the roof
                     "trigger": "climb"
                 },
                 descs={"look": "You can climb back down the tree if you want."},
@@ -406,7 +409,7 @@ worldMap = {
                 desc="There's tree branches you can climb down on.",
                 reqs={
                     "stat": "acrobatics",
-                    "value": 0,  # dont trap them on the roof
+                    "value": -100,  # dont trap them on the roof
                     "trigger": "climb"
                 },
                 descs={"look": "You can climb down the tree if you want."},
@@ -501,6 +504,20 @@ worldMap = {
         events={
             "cave": event.Event(
                 desc="One of the towers has a cave, something inside is glinting in the light.",
+                reqs={
+                    "stat" : "curiosity",
+                    "value" : AREA_DIFFICULTY.HOUSE,
+                    "trigger" : "look"
+                },
+                descs={
+                    "look":"Your fear of the dark is overpowering your curiosity to look!",
+                    "sniff":"The cave smells a little fishy.",
+                    "hit":"Why are you so violent?!",
+                    "climb":"You can't climb in before you look inside!"
+                },
+                trigger_text = "You cautiously look inside the cave... There's a weird fish hat in there!",
+                remove_self=True,
+                on_trigger=[["player", "give_items", ["fish hat"]]]
             ),
             "tower": event.Event(
                 desc="There's something on top of a tower you can smell, and it smells good!",
@@ -513,7 +530,7 @@ worldMap = {
                     "look": "You will need to climb up there to see it.",
                     "sniff": "Whatever's up there smells delicious.",
                     "hit": "You bat at the tower and it doesn't budge.",
-                    "climb": "You aren't acrobatic enough to climb that high!"
+                    "climb": "You aren't acrobatic enough yet to climb that high!"
                 },
                 trigger_text="You get to the top of the tallest tower and find a packet of Gogurt! You aren't sure how to open it so you save it for later.",
                 remove_self=True,
@@ -529,6 +546,30 @@ worldMap = {
         name="Kitchen",
         area="House (Inside)",
         description="This is where the cat food is! There are stairs leading down into darkness...",
+        events={
+          "stairs" : event.Event(
+              desc="There are stairs leading down into a dark spooky basement here.",
+              reqs={
+                  "stat" : "ferocity",
+                  "value" : AREA_DIFFICULTY.HOUSE + 1,
+                  "trigger" : "climb"
+              },
+              descs={
+                  "look" : "The bottom of the stairs is pitch black and scary.",
+                  "climb" : "You are too scared to climb down the stairs! You're not very ferocious...",
+                  "sniff" : "You can smell dampness and cats down there.",
+                  "hit" : "You swipe at the darkness and scare yourself!"
+              },
+              trigger_text="You bravely climb down the stairs and go into the basement!",
+              remove_self=False,
+              on_trigger = [["player", "enter", "basement1"]]
+          ),
+          "faucet" : event.Event(
+              
+          )
+        },
+        random_battle=True,
+        enemies=["vacuum", "dustbunny", "housemouse"],
         exits=["house2", False, False, "house3"]
     ),
     "nyard1": room.Room(
@@ -645,9 +686,9 @@ worldMap = {
     ),
 
     "basement1": room.Room(),
-    "basement2": room.Room(),
+    "basement2": room.Room(), # mori in here
 
-    "alley1": room.Room(),
+    "alley1": room.Room(), # moreau paths here
     "alley2": room.Room(),
     "alley3": room.Room(),
     "alley4": room.Room(),

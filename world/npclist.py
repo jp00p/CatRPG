@@ -18,18 +18,20 @@ npcList = {
   "mochi" : npc.NPC(
     name="Mochi",
     location="porch",
-    path=["porch", "fyard2", "fyard1", "fyard3", "fyard4"],
-    desc="A cutie chunky tuxedo baby who likes to hang out around the front porch. He looks hungry, as usual!",
+    path=["porch", "fyard2", "fyard2", "fyard1", "fyard1", "fyard3", "fyard3", "fyard4"],
+    desc="A cutie chunky tuxedo baby who likes to hang out around the front yard and the porch. He looks hungry, as usual!",
     thanks="Mochi says thank you! Then he begins searching for more food.",
     quest_type="item",
     required = ["mochifood", 5],
     states = {
-      0: "Mochi is starving! He needs 5 bags of food, now! He thinks he saw some in the backyard."
+      0: "Mochi is starving! He needs 5 bags of food, now! He thinks he saw some in the backyard.",
+      1: "Mochi looks so hungry! He needs those bags of food.",
+      2: "Mochi thanks you for the delicious food!"
     }
   ),
   "mori" : npc.NPC(
     name="Mori",
-    location="basement1"
+    location="basement2"
   ),
   "mika" : npc.NPC(
     name="Mika",
@@ -39,7 +41,14 @@ npcList = {
   "morty" : npc.NPC(
     name="Mortimer",
     location="byard1",
-    path=False #["byard1","byard5","byard6","byard2","byard3","byard7","byard8","byard4"]
+    desc="A weird marbled tabby baby",
+    thanks="",
+    quest_type="",
+    required= [],
+    states={
+      
+    },
+    path=["byard1","byard5","byard6","byard2","byard3","byard7","byard8","byard4"]
   ),
   "dorian" : npc.NPC(
     name="Dorian",

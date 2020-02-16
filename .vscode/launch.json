@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "Main Game",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "program": "play.py",
             "console": "integratedTerminal"
         }
     ]

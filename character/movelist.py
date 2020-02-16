@@ -1,5 +1,17 @@
 from . import move
 
+class COLORS:
+    PURPLE = '\033[95m'
+    CYAN = '\033[96m'
+    DARKCYAN = '\033[36m'
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    END = '\033[0m'
+
 moveList = {
     "claw": move.Move(
         name="Claw",
@@ -13,7 +25,7 @@ moveList = {
         verbs=['{} does a super fast double-claw!'],
         dmg=[1, 8],
         times=4,
-        hit=-2
+        hit=-2,
     ),
     "bite": move.Move(
         name="Bite",
@@ -23,18 +35,31 @@ moveList = {
     ),
     "bunny": move.Move(
         name="Bunny Kick",
-        verbs=['{} grabs and kicks like a wild bunny!'],
+        verbs=['{} grabs and kicks like a wild bunny'],
         dmg=[1, 12]
     ),
     "pounce": move.Move(
         name="Pounce",
-        verbs=['{} charges up and pounces!'],
+        verbs=['{} charges up and pounces!', '{} pounces on {}!'],
         dmg=[4, 16],
         hit=2
     ),
+    "slime": move.Move(
+      name="Slime",
+      verbs=["{} shoots slime at {}!", "{} covers {} in slime!", "{} excretes slime!"],
+      dmg=[0,15],
+      hit=-5
+    ),
+    "slurp": move.Move(
+      name="Slurp",
+      verbs=["{} slurps {}!", "{} makes a weird slurping noise!"],
+      dmg=[1,4],
+      hit=5,
+      times=3
+    ),
     "shroom": move.Move(
         name="Shroom Spores",
-        verbs=['{} flings spores all over!'],
+        verbs=['{} flings spores all over!', '{} does mushroomy things at {}!'],
         dmg=[10,15],
         hit=4
     ),
@@ -45,8 +70,10 @@ moveList = {
     ),
     "squeak": move.Move(
         name="Squeak",
-        verbs=['{} squeaks loudly!'],
-        dmg=[1, 1]
+        verbs=['{} squeaks loudly!', '{} makes a shrill shrieking noise!'],
+        dmg=[1, 1],
+        effect=["ringing", 50],
+        effect_text="There's a ringing in your ears!"
     ),
     "hiss": move.Move(
         name="Hiss",
@@ -59,11 +86,13 @@ moveList = {
         verbs=['{} coughs up a hairball!', '{} starts barfing and grosses {} out!'],
         dmg=[1, 12],
         hit=-1,
-        times=2
+        times=2,
+        effect=["stinkyface", 100],
+        effect_text=COLORS.GREEN+"You are grossed out!"+COLORS.END
     ),
     "slither": move.Move(
         name="Slither",
-        verbs=["{} does a creepy spiraling slither at {}!"],
+        verbs=["{} does a creepy spiraling slither at {}!", "{} does a scary slither at {}!"],
         dmg=[1, 4],
         times=3
     ),

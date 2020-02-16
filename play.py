@@ -52,8 +52,6 @@ class COLORS:
 # Utility functions
 screen_width = 79
 text_wrapper = textwrap.TextWrapper(width=screen_width-4)
-# works in IE6
-
 
 def cls():
     operating_system = platform.system()
@@ -152,46 +150,58 @@ class Character:
         cls()
         time.sleep(1)
         for _ in range(0, move.times):
+            # TODO: Consider modulus of stats because the player seems OP
+            # Maybe increase monsters stats with the player...
+            # Maybe every 3 levels?
+            
+            apply_effect = False
             move_desc = choice(move.verbs)
-            speak(move_desc.format(self.name, other.name))  # describe attack
-            # roll dice, add mods
-            d20 = randint(1, 20)
-            hit_mod = move.hit
-            base_dmg = randint(move.dmg[0], move.dmg[1])
+            speak(move_desc.format(self.name, other.name))  # describe attack           
+            d20 = randint(1, 20) # roll d20          
+            d100 = randint(1, 100) # roll d100
+            hit_mod = move.hit # add hit modifier from the move
+            hit = d20+self.acrobatics+hit_mod  # add acrobatics bonus
+            base_dmg = randint(move.dmg[0], move.dmg[1]) # roll damage from the move
+            target = 10+other.acrobatics  # target's AC
             dmg = 0  # holds the total dmg
-            hit = d20+self.acrobatics+hit_mod  # THAC0
-            target = 10+other.acrobatics  # AC
+            
+            if(move.effect != False and type(self) == Enemy):
+                if(d100 <= move.effect[1]):
+                    apply_effect = True
+            
             # print("DEBUG: MOVE HIT:{} -- BASE_DMG:{}".format(hit_mod, base_dmg))
             # print("DEBUG: ATTACK #{} -- HIT ROLL: {}({}) -- TARGET AC: {} ".format(
             #     attack_time, hit, d20, target))
-            attack_time += 1
-            dmg_string = ""
+            
+            attack_time += 1 # increment the number of attacks we've done this turn
+            dmg_string = "" # holds the damage text for concatenating
 
-            if(d20 == 20):
-                # crit
-                # do the max dmg of the move + ferociy
-                dmg = self.ferocity+move.dmg[1]
-                print("CRIT! Deals {} damage".format(dmg))
-                print(colored(Style.BRIGHT+"CRITICAL HIT!", "red", "on_white"))
+            if(d20 == 20): # nat 20
+                dmg = self.ferocity+move.dmg[1] # do the max damage of the move + ferociy bonus
+                print(colored(Style.BRIGHT+"CRITICAL HIT!", "white", "on_red"))
                 dmg_string += "\n"
                 dmg_string += "Deals {} damage!".format(dmg)
                 other.hp -= dmg
-            elif(hit >= target):
-                # normal hit
-                dmg = (base_dmg+self.ferocity) - other.acrobatics
+                
+            elif(hit >= target): # normal hit
+                dmg = (base_dmg+self.ferocity) - other.acrobatics # do the rolled damage + ferocity bonus minus the others acrobatics
                 if(dmg < 0):
-                    # dmg mitigated by armor?
+                    # dmg mitigated by acrobatics/etc?
                     dmg_string += "It barely hurts.\n"
                     dmg = randint(0, 1)
-                #print("Deals {} damage".format(dmg))
                 dmg_string += "Deals {} damage".format(dmg)
                 other.hp -= dmg
+                
             else:
                 # miss
-                # print(self.name + " missed!")
                 dmg_string += "{} missed!".format(self.name)
             speak(dmg_string)
-        time.sleep(0.5)
+            
+            if(apply_effect and type(other) == Player): # enemies don't get effects
+                other.apply_item(gameItems[move.effect[0]])
+                print(move.effect_text.format(self.name, other.name))
+                    
+        time.sleep(0.4)
         cls()
 
 
@@ -562,6 +572,8 @@ Your prey is: {}
 
 +-------- Moves -------+
 {}========================
+
+Type the number of your move:
 '''
 
         while(self.hp > 0 and enemy.hp > 0):
@@ -588,6 +600,7 @@ Your prey is: {}
         time.sleep(1)
         cls()
         victory = True
+        speak("YOU WIN!!!")
         self.xp += enemy.xp_given
         d100 = randint(1, 100)
         if(enemy.drop != False):
@@ -599,6 +612,8 @@ Your prey is: {}
             self.kills[enemy.name.lower()] += 1
         if(self.xp >= self.required_xp()):
             self.level_up()
+        anykey()
+        cls()
         return victory
 
 
