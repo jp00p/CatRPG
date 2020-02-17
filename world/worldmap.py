@@ -41,7 +41,9 @@ worldMap = {
         name="Debug room",
         area="Secret",
         description="Testing purposes only",
-        exits=["start4", "start4", "start4", "start4"]
+        exits=["start4", "start4", "start4", "start4"],
+        enemies=["mouse"],
+        battle_enter=True
     ),
 
     "start1": room.Room(
@@ -164,7 +166,7 @@ worldMap = {
         name="Your Yard",
         area="Outskirts",
         description="This is the yard you've known most of your life. There's nothing new or interesting here. All the mice have been hunted to extinction.\nIt's time to venture out and seek new friends in the neighborhood!",
-        exits=[False, "start5", False, False],
+        exits=["dummy", "start5", False, False],
         random_battle=False,
         events={
             "home": event.Event(
@@ -633,7 +635,8 @@ worldMap = {
         name="Backyard 1",
         area="Backyard",
         description="Backyard 1",
-        exits=[False, "byard2", "byard5", False]
+        exits=[False, "byard2", "byard5", False],
+        battle_enter=True
     ),
     "byard2": room.Room(
         room_id="byard2",

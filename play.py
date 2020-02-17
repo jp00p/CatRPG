@@ -7,7 +7,7 @@ import time
 import string
 import platform
 import copy
-
+import math
 
 from random import seed, randint, randrange, choice, sample
 from pyfiglet import Figlet
@@ -62,7 +62,7 @@ def cls():
 
 
 def anykey():
-    input("Press enter key to continue")
+    input("Press enter to continue")
 
 
 def hr():
@@ -160,7 +160,7 @@ class Character:
             d20 = randint(1, 20) # roll d20          
             d100 = randint(1, 100) # roll d100
             hit_mod = move.hit # add hit modifier from the move
-            hit = d20+self.acrobatics+hit_mod  # add acrobatics bonus
+            hit = d20+(self.acrobatics/2)+hit_mod  # add half acrobatics bonus and full move bonus
             base_dmg = randint(move.dmg[0], move.dmg[1]) # roll damage from the move
             target = 10+other.acrobatics  # target's AC
             dmg = 0  # holds the total dmg
@@ -168,23 +168,22 @@ class Character:
             if(move.effect != False and type(self) == Enemy):
                 if(d100 <= move.effect[1]):
                     apply_effect = True
-            
-            # print("DEBUG: MOVE HIT:{} -- BASE_DMG:{}".format(hit_mod, base_dmg))
-            # print("DEBUG: ATTACK #{} -- HIT ROLL: {}({}) -- TARGET AC: {} ".format(
-            #     attack_time, hit, d20, target))
-            
+                      
             attack_time += 1 # increment the number of attacks we've done this turn
             dmg_string = "" # holds the damage text for concatenating
 
+            print("DEBUG: MOVE HIT MOD:{} -- BASE MOVE DMG({}-{}):{}".format(hit_mod, move.dmg[0], move.dmg[1], base_dmg))
+            print("DEBUG: ATTACK #{} -- TO HIT ROLL: {}(d20:{}) -- TARGET AC: {} ".format(attack_time, hit, d20, target))
+
             if(d20 == 20): # nat 20
                 dmg = self.ferocity+move.dmg[1] # do the max damage of the move + ferociy bonus
-                print(colored(Style.BRIGHT+"CRITICAL HIT!", "white", "on_red"))
+                print(colored("CRITICAL HIT!", "white", "on_red"))
                 dmg_string += "\n"
                 dmg_string += "Deals {} damage!".format(dmg)
                 other.hp -= dmg
                 
             elif(hit >= target): # normal hit
-                dmg = (base_dmg+self.ferocity) - other.acrobatics # do the rolled damage + ferocity bonus minus the others acrobatics
+                dmg = (base_dmg+self.ferocity) - math.floor(other.acrobatics/2) # do the rolled damage + ferocity bonus minus the others acrobatics
                 if(dmg < 0):
                     # dmg mitigated by acrobatics/etc?
                     dmg_string += "It barely hurts.\n"
@@ -198,8 +197,9 @@ class Character:
             speak(dmg_string)
             
             if(apply_effect and type(other) == Player): # enemies don't get effects
-                other.apply_item(gameItems[move.effect[0]])
-                print(move.effect_text.format(self.name, other.name))
+                if(other.attitude != gameItems[move.effect[0]]):
+                    other.apply_item(gameItems[move.effect[0]])
+                    print(move.effect_text.format(self.name, other.name))
                     
         time.sleep(0.4)
         cls()
@@ -418,6 +418,15 @@ class Player(Character):
             i = tickmap[i]
             if(i.npc != ""):
                 npcList[i.npc].tick(worldMap)
+                
+        if(room.battle_enter and randint(1,100) <= 33):
+            e = gameMonsters[choice(room.enemies)]
+            enemy = Enemy(name=e["name"], hp=e["hp"],
+                          moves=e["moves"], xp_given=e["xp_given"], drop=e["drop"], fer=e["fer"], acr=e["acr"])
+            cls()
+            print("You are ambushed!")
+            time.sleep(1)
+            self.battle(enemy)
         self.look(worldMap[self.location])
 
     def look(self, room):
@@ -681,6 +690,10 @@ class Game():
 
             action = action.split()
             stopwords = ['at', 'the', 'my', 'a', 'to', 'up', 'down', 'on']
+            all_directions = []
+            for dirlist in self.up_dir, self.right_dir, self.down_dir, self.left_dir:
+                for dir in dirlist:
+                    all_directions.append(dir)
             verb = action[0]
             room_events = world.worldMap[self.player.location].get_event_list()
 
@@ -705,13 +718,14 @@ class Game():
                 if(verb == "help"):
                     self.show_help_screen(True)
                     pass
+                
                 if(verb in ["move", "go"] and noun == ""):
                     print("Try typing 'move north' or 'go east'")
                     pass
-                if(verb in ["move", "go"] and noun not in (self.up_dir, self.right_dir, self.down_dir, self.left_dir)):
-                    print("Invalid direction")
+                elif(verb in ["move", "go"] and noun not in all_directions):
+                    print("Invalid direction {}".format(noun))
                     pass
-                if(verb in ["move", "go"] and noun != ""):
+                elif(verb in ["move", "go"] and noun != ""):
                     if noun.lower() in self.up_dir:
                         direction = 0
                     elif noun.lower() in self.right_dir:
@@ -724,6 +738,7 @@ class Game():
                     self.player.try_move(
                         world.worldMap[self.player.location], direction)
                     pass
+                
                 if(verb in ["look", "inspect", "examine", "lay", "lie", "sniff", "smell", "climb", "take", "get", "grab", "hit", "paw", "push"]):
                     if(verb in ["hit", "push", "paw"]):
                         verb = "hit"

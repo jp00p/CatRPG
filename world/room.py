@@ -17,7 +17,8 @@ class COLORS:
 class Room:
     def __init__(self, room_id='', name='', area='', description='', room_type='',
                  enemies=[], items=[], exits=[],
-                 random_battle=False, state=0, states={}, events=False, npc="", **kwargs):
+                 random_battle=False, state=0, states={}, events=False, npc="", 
+                 battle_enter=False, **kwargs):
         self.room_type = room_type
         self.id = room_id
         self.name = name
@@ -31,6 +32,7 @@ class Room:
         self.exits = exits  # which exits does this room have
         self.random_battle = random_battle
         self.npc = npc
+        self.battle_enter = battle_enter # start battle on entering
 
     def show_exits(self, worldMap):  # pass worldmap here probably...
         exit_text = ""
