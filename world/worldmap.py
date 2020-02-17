@@ -636,7 +636,8 @@ worldMap = {
         area="Backyard",
         description="Backyard 1",
         exits=[False, "byard2", "byard5", False],
-        battle_enter=True
+        battle_enter=True,
+        enemies=["dog", ]
     ),
     "byard2": room.Room(
         room_id="byard2",

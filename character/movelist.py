@@ -81,6 +81,12 @@ moveList = {
         dmg=[1, 10],
         hit=1
     ),
+    "bark": move.Move(
+      name="Bark",
+      verbs=["{} barks loudly!"],
+      dmg=[1,10],
+      hit=3
+    ),
     "barf": move.Move(
         name="Hairball",
         verbs=['{} coughs up a hairball!', '{} starts barfing and grosses {} out!'],

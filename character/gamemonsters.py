@@ -26,6 +26,14 @@ gameMonsters = {
         "fer": 1,
         "acr": 1
     },
+    "dog":{
+      "name" : "Dog",
+      "moves" : ["bark", "chase"],
+      "hp" : 40,
+      "xp_given" : 6,
+      "fer" : 5,
+      "acr" : 3
+    },
     "mushroom": {
         "name": "Mad Mushroom",
         "moves": ["shroom", "kick"],

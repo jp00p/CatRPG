@@ -31,6 +31,7 @@ worldMap = world.worldMap
 breedList = character.breedList
 npcList = world.npcList
 gameMonsters = character.gameMonsters
+difficulty = world.AREA_DIFFICULTY
 
 
 init(autoreset=True)
@@ -150,10 +151,7 @@ class Character:
         cls()
         time.sleep(1)
         for _ in range(0, move.times):
-            # TODO: Consider modulus of stats because the player seems OP
-            # Maybe increase monsters stats with the player...
-            # Maybe every 3 levels?
-            
+           
             apply_effect = False
             move_desc = choice(move.verbs)
             speak(move_desc.format(self.name, other.name))  # describe attack           
@@ -174,6 +172,7 @@ class Character:
 
             print("DEBUG: MOVE HIT MOD:{} -- BASE MOVE DMG({}-{}):{}".format(hit_mod, move.dmg[0], move.dmg[1], base_dmg))
             print("DEBUG: ATTACK #{} -- TO HIT ROLL: {}(d20:{}) -- TARGET AC: {} ".format(attack_time, hit, d20, target))
+            time.sleep(0.5)
 
             if(d20 == 20): # nat 20
                 dmg = self.ferocity+move.dmg[1] # do the max damage of the move + ferociy bonus
@@ -296,7 +295,7 @@ class Player(Character):
         if(item not in list(gameItems.keys())):
             print("That's not an item!")
         elif(item not in self.items):
-            print("You don't have that item")
+            print("You don't have that item.")
         elif(item.item_type != "hat"):
             print("Hmm... How would a cat equip that?")
         else:
@@ -329,6 +328,7 @@ class Player(Character):
         self.acrobatics += item.acr
         self.curiosity += item.cur
         self.max_hp += item.max_hp
+        self.max_hp()
         if(item.move != False):
             self.moves.append(moveList[item.move])
 
@@ -387,7 +387,8 @@ class Player(Character):
         status += "    Ferocity: {:2d}    Acrobatics: {:2d}    Curiosity: {:2d}\n".format(
             self.ferocity, self.acrobatics, self.curiosity)
         status += "    Moves: {}\n".format(self.get_moves())
-        status += "    Items: {}".format(self.list_items())
+        status += "    Items: {}".format(self.list_items())           
+            
         print_msg_box(status, title, align="none")
         #print("DEBUG:Quest Items:{}\nQuest Monsters:{}\nQuest Kills:{}\n".format(self.quest_items, self.quest_monsters, self.kills))
 
