@@ -9,10 +9,12 @@ gameItems = {
     "brave":       item.Item("Brave", 5, 0, 0, 0, item_type="attitude"),
     "sleepy":      item.Item("Sleepy", -1, -2, -1, 0, item_type="attitude"),
     "stinkyface":  item.Item("Stinkyface", -1, -1, 2, 0, item_type="attitude", move="barf"),
-    "nostalgic":   item.Item("Nostalgic", 0, 0, 0, 25, item_type="attitude"),
+    "nostalgic":   item.Item("Nostalgic", 0, 0, 0, 25, item_type="attitude", move="meow"),
     "batsense":    item.Item("Bat Senses", 0, 0, 5, 0, item_type="attitude"),
     "squeaky":     item.Item("Squeaky", 2, 2, 1, 10, item_type="attitude"),
     "ringing":     item.Item("Ringing in Ears", 0, 0, -2, 0, item_type="attitude"),
+    "confused":    item.Item("Confused", 0, 0, -3, 0, item_type="attitude"),
+    "calm":        item.Item("Calm", 0, 0, 0, 25, item_type="attitude"),
 
     "top hat":      item.Item("Top Hat", 3, 3, 3, 15, item_type="hat"),
     "bunny ears":   item.Item("Bunny Ears", 0, 0, 10, 0, item_type="hat", move="bunny"),
@@ -23,6 +25,7 @@ gameItems = {
     "ferret hat":   item.Item("Ferret Hat", 1, 1, 1, 0, item_type="hat", move="dance"),
     "mushroom hat": item.Item("Mushroom Hat", 0, 0, 0, 50, item_type="hat", move="shroom"),
     "mouse ears":   item.Item("Mouse Ears", 0, 2, 2, 0, item_type="hat", move="nibble"),
+    "dog ears":     item.Item("Dog Ears", 5, 0, -1, 0, item_type="hat", move="chase"),
 
     "gogurt":  item.Item("Gogurt", item_type="quest"),
     "sweater": item.Item("Sweater", item_type="quest"),
@@ -34,6 +37,12 @@ gameItems = {
         item_type="usable",
         item_effect=[["player", "give_hp", randint(1, 8)+1]],
         use_text="You heal a little hp!"
+    ),
+    "calming spray": item.Item(
+      name="Calming Spray",
+      item_type="usable",
+      item_effect=[["player", "apply_item", "calm"]],
+      use_text="You feel calm!"
     ),
     "gold star": item.Item(
         name="Gold Star",

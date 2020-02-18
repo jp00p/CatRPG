@@ -32,7 +32,8 @@ gameMonsters = {
       "hp" : 40,
       "xp_given" : 6,
       "fer" : 5,
-      "acr" : 3
+      "acr" : 3,
+      "drop" : ["dog ears", 15]
     },
     "mushroom": {
         "name": "Mad Mushroom",
@@ -47,7 +48,7 @@ gameMonsters = {
         "name": "Angry Squirrel",
         "moves": ["bite", "claw", "pounce"],
         "hp": 30,
-        "xp_given": 2,
+        "xp_given": 3,
         "drop": ["scratcher", 15],
         "fer": 4,
         "acr": 2

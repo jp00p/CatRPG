@@ -61,7 +61,9 @@ moveList = {
         name="Shroom Spores",
         verbs=['{} flings spores all over!', '{} does mushroomy things at {}!'],
         dmg=[10,15],
-        hit=4
+        hit=4,
+        effect=["confused", 25],
+        effect_text="You become confused!"
     ),
     "nibble": move.Move(
         name="Nibble",
@@ -72,8 +74,13 @@ moveList = {
         name="Squeak",
         verbs=['{} squeaks loudly!', '{} makes a shrill shrieking noise!'],
         dmg=[1, 1],
-        effect=["ringing", 50],
+        effect=["ringing", 25],
         effect_text="There's a ringing in your ears!"
+    ),
+    "launch": move.Move(
+        name="Launch",
+        verbs=["{} launches at warp speed towards {}!"],
+        dmg=[5,20]
     ),
     "hiss": move.Move(
         name="Hiss",
@@ -87,13 +94,25 @@ moveList = {
       dmg=[1,10],
       hit=3
     ),
+    "meow": move.Move(
+      name="Meow",
+      verbs=["{} meows softly!", "{} meows at {}!"],
+      dmg=[10,12],
+      hit=-3
+    ),
+    "chase": move.Move(
+        name="Chase",
+        verbs=["{} chases {} around!", "{} chases after {}!"],
+        dmg=[5,15],
+        hit=3,
+    ),
     "barf": move.Move(
         name="Hairball",
         verbs=['{} coughs up a hairball!', '{} starts barfing and grosses {} out!'],
         dmg=[1, 12],
         hit=-1,
         times=2,
-        effect=["stinkyface", 100],
+        effect=["stinkyface", 33],
         effect_text=COLORS.GREEN+"You are grossed out!"+COLORS.END
     ),
     "slither": move.Move(

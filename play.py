@@ -265,7 +265,7 @@ class Player(Character):
 
     def give_move(self, move):
         if(type(move) == str):
-            move = moveList["move"]
+            move = moveList[move]
         if(move not in self.moves):
             self.moves.append(move)
             print("You learned: {}".format(move.name))
@@ -291,22 +291,24 @@ class Player(Character):
             return
         print("DEBUG Current items:\n{}".format(self.list_items()))
         print("DEBUG Item name to equip:{} ".format(item))
-
+        
         if(item not in list(gameItems.keys())):
             print("That's not an item!")
-        elif(item not in self.items):
-            print("You don't have that item.")
-        elif(item.item_type != "hat"):
-            print("Hmm... How would a cat equip that?")
-        else:
+            return
+        else: 
             item = gameItems[item]
-            self.items.remove(item)
-            if(self.hat != None):
-                print("You remove your {} and put it back in your inventory.".format(
-                    self.hat.name))
-                self.items.append(self.hat)
-            self.apply_item(item)
-            print("You put on the {}".format(item.name))
+            if(item not in self.items):
+                print("You don't have that item.")
+            elif(item.item_type != "hat"):
+                print("Hmm... How would a cat equip that?")
+            else:
+                self.items.remove(item)
+                if(self.hat != None):
+                    print("You remove your {} and put it back in your inventory.".format(
+                        self.hat.name))
+                    self.items.append(self.hat)
+                self.apply_item(item)
+                print("You put on the {}".format(item.name))
 
     def apply_item(self, item):
         if(type(item) == str):
@@ -328,7 +330,7 @@ class Player(Character):
         self.acrobatics += item.acr
         self.curiosity += item.cur
         self.max_hp += item.max_hp
-        self.max_hp()
+        self.hp_max()
         if(item.move != False):
             self.moves.append(moveList[item.move])
 
@@ -604,6 +606,7 @@ Type the number of your move:
             if(enemy.hp > 0):
                 enemy.attack(self, choice(enemy.moves))
                 if(self.hp <= 0):
+                    self.hp = 0
                     return False
                     # END OF COMBAT
             turn += 1
@@ -709,6 +712,15 @@ class Game():
             if(verb == "teleport"):
                 self.player.enter(noun)
                 pass
+            if(verb == "debug69"):
+                for item in gameItems:
+                    if(gameItems[item].item_type != "attitude"):
+                        self.player.give_items([item])
+                for move in moveList:
+                    self.player.give_move(moveList[move])
+            if(verb == "bughunt"):
+                self.player.battle(noun)
+                
             elif (verb in self.acceptable_verbs):
                 # handle specific verbs
                 cls()

@@ -19,14 +19,14 @@ npcList = {
     name="Mochi",
     location="porch",
     path=["porch", "fyard2", "fyard2", "fyard1", "fyard1", "fyard3", "fyard3", "fyard4"],
-    desc="A cutie chunky tuxedo baby who likes to hang out around the front yard and the porch. He looks hungry, as usual!",
-    thanks="Mochi says thank you! Then he begins searching for more food.",
+    desc="Mochi is here! He's a cute chunky tuxedo kitty who likes to hang out around the front yard and porch. He looks hungry, as usual!",
+    thanks="Mochi thanks you!  ...Then he charges at you, making you startled!",
     quest_type="item",
     required = ["mochifood", 5],
     states = {
       0: "Mochi is starving! He needs 5 bags of food, now! He thinks he saw some in the backyard.",
-      1: "Mochi looks so hungry! He needs those bags of food.",
-      2: "Mochi thanks you for the delicious food!"
+      1: "Mochi looks so hungry! He needs those bags of food ASAP!",
+      2: "Mochi appreciates the delicious food you brought him."
     }
   ),
   "mori" : npc.NPC(

@@ -34,7 +34,6 @@ class AREA_DIFFICULTY:
 # bushes
 # spiders
 
-
 worldMap = {
     "dummy": room.Room(
         room_id="dummy",
@@ -432,16 +431,34 @@ worldMap = {
     "porch": room.Room(
         room_id="porch",
         name="Porch",
-        area="House (Outside)",
-        description="Where most adventures begin for the local cats. A good place for scouting, surveying, and hiding.",
+        area="Front Yard",
+        description="Where most adventures begin for the local Mo Family. A good place for scouting, surveying, and lounging.",
         exits=["house3", False, "fyard1", False],
-        npc="mochi"
+        npc="mochi",
+        events={
+            "note": event.Event(
+                desc="There's a note written in cat language here.",
+                reqs={
+                    "stat":"curiosity",
+                    "value":AREA_DIFFICULTY.FYARD,
+                    "trigger":"look"
+                },
+                descs={
+                    "look":"Unfortunately, you aren't curious enough to have learned cat language.",
+                    "hit":"You paw at the note playfully!",
+                    "sniff":"The note smells like it was written with squid ink",
+                    "take":"The note is firmly pinned to the wall."
+                },
+                trigger_text="The note reads: \"Mochi likes to hang out on the porch, and he wanders around the front yard slowly. He should be easy to find!\"",
+                remove_self=False
+            )
+        }
     ),
     "house1": room.Room(
         room_id="house1",
         name="Utility Room",
         area="House (Inside)",
-        description="This room has some heavy duty litter boxes in it, and a bunch of weird human stuff.",
+        description="This room has a bunch of weird human stuff. Some of it looks like it would be fun to destroy! The loominig presence of the vacuum can be felt in this room.",
         exits=[False, "house2", "house3", False],  # opens north to backyard6
         random_battle=True,
         enemies=["ferret", "vacuum", "dustbunny"],
@@ -459,13 +476,32 @@ worldMap = {
                     "hit": "You paw at the door ineffectively. You aren't strong enough!",
                     "take": "You can't take a door."
                 },
-                trigger_text="You push the door open enough to squeeze through! You can get outside now!",
+                trigger_text="You push the door open enough to squeeze through! You can get out to the backyard now!",
                 remove_self=True,
                 on_trigger=[
                     ["room", "set_exits", ["byard6", "house2", "house3", False]],
-                    # set backyard room's exits too
+                    # set byard6 room's exits too
                     ["room", "set_exits", ["byard2", "byard7",
                                            "house1", "byard5"], "byard6"]
+                ]
+            ),
+            "shelf": event.Event(
+                desc="On top of a big shelf, you smell something interesting.",
+                reqs={
+                    "stat":"acrobatics",
+                    "value":AREA_DIFFICULTY.HOUSE,
+                    "trigger":"climb"
+                },
+                descs={
+                    "look":"You can't see at the top of the big shelf",
+                    "sniff":"Whatever's up there is making you feel extremely curious!",
+                    "climb":"You try and fail to climb up the shelf! You aren't acrobatic enough.",
+                },
+                trigger_text="You launch yourself onto the shelf, only to knock it over with a loud crash! Everything falls off the shelf and breaks, and you feel proud and brave.",
+                remove_self=True,
+                on_trigger=[
+                    ["player", "give_move", "launch"],
+                    ["player", "apply_item", "brave"]
                 ]
             )
         }
@@ -637,7 +673,7 @@ worldMap = {
         description="Backyard 1",
         exits=[False, "byard2", "byard5", False],
         battle_enter=True,
-        enemies=["dog", ]
+        enemies=["dog", "angry_squirrel"]
     ),
     "byard2": room.Room(
         room_id="byard2",
