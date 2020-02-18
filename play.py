@@ -289,8 +289,8 @@ class Player(Character):
         if(item == ""):
             print("What are you trying to equip?")
             return
-        print("DEBUG Current items:\n{}".format(self.list_items()))
-        print("DEBUG Item name to equip:{} ".format(item))
+        # print("DEBUG Current items:\n{}".format(self.list_items()))
+        # print("DEBUG Item name to equip:{} ".format(item))
         
         if(item not in list(gameItems.keys())):
             print("That's not an item!")

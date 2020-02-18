@@ -528,7 +528,7 @@ worldMap = {
                 trigger_text="You climb up on the bed and find a portable cat scratcher!",
                 remove_self=True,
                 on_trigger=[["player", "give_items", ["scratcher"]]]
-            )
+            ),
         },
         exits=[False, False, "house4", "house1"],
         random_battle=True,
@@ -538,7 +538,7 @@ worldMap = {
         room_id="house3",
         name="Living Room",
         area="House (Inside)",
-        description="This room is a forest of cat towers!",
+        description="This room is a forest of cat towers! The evil aura of a vacuum draws near.",
         events={
             "cave": event.Event(
                 desc="One of the towers has a cave, something inside is glinting in the light.",
@@ -583,7 +583,7 @@ worldMap = {
         room_id="house4",
         name="Kitchen",
         area="House (Inside)",
-        description="This is where the cat food is! There are stairs leading down into darkness...",
+        description="This is where the cat food usually is! The bowls are sadly empty right now. There are stairs leading down into darkness...",
         events={
           "stairs" : event.Event(
               desc="There are stairs leading down into a dark spooky basement here.",
@@ -601,9 +601,6 @@ worldMap = {
               trigger_text="You bravely climb down the stairs and go into the basement!",
               remove_self=False,
               on_trigger = [["player", "enter", "basement1"]]
-          ),
-          "faucet" : event.Event(
-              
           )
         },
         random_battle=True,
@@ -659,7 +656,7 @@ worldMap = {
                 },
                 trigger_text="You spot something in the grass across the pond! You slip and fall into the pond and scramble out on the other side, where you only find a leaf in the wind. Now you're grumpy!",
                 remove_self=False,
-                on_trigger=[["player", "enter", "dummy"],
+                on_trigger=[["player", "enter", "byard8"],
                             ["player", "apply_item", "grumpy"]]
 
             )
@@ -668,7 +665,7 @@ worldMap = {
 
     "byard1": room.Room(
         room_id="byard1",
-        name="Backyard 1",
+        name="Mud Puddles",
         area="Backyard",
         description="Backyard 1",
         exits=[False, "byard2", "byard5", False],
@@ -677,51 +674,51 @@ worldMap = {
     ),
     "byard2": room.Room(
         room_id="byard2",
-        name="Backyard 2",
+        name="Gate to Alleyway",
         area="Backyard",
         description="Backyard 2",
         exits=[False, "byard3", "byard6", "byard1"]
     ),
     "byard3": room.Room(
         room_id="byard3",
-        name="Backyard 3",
+        name="Mound of Dirt",
         area="Backyard",
         description="Backyard 3",
         exits=[False, "byard4", "byard7", "byard2"]
     ),
     "byard4": room.Room(
         room_id="byard4",
-        name="Backyard 4",
+        name="Lilac Tree",
         area="Backyard",
         description="Backyard 4",
         exits=[False, False, "byard8", "byard3"]
     ),
     "byard5": room.Room(
         room_id="byard5",
-        name="Backyard 5",
+        name="Flower Beds",
         area="Backyard",
         description="Backyard 5",
         exits=["byard1", "byard6", False, False]
     ),
     "byard6": room.Room(
         room_id="byard6",
-        name="Backyard 6",
+        name="Savannah Zone",
         area="Backyard",
         description="Backyard 6",
         exits=["byard2", "byard7", False, "byard5"]
     ),
     "byard7": room.Room(
         room_id="byard7",
-        name="Backyard 7",
+        name="Leaf Mountain",
         area="Backyard",
         description="Backyard 7",
         exits=["byard3", "byard8", False, "byard6"]
     ),
     "byard8": room.Room(
         room_id="byard8",
-        name="Backyard 8",
+        name="Garden Beds",
         area="Backyard",
-        description="Backyard 8",
+        description="A lush garden where critters like to forage.",
         exits=["byard4", False, "driveway", "byard7"]
     ),
 
